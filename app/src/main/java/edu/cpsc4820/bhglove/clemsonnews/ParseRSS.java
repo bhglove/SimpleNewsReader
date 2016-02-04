@@ -16,8 +16,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Benjios on 2/3/2016.
+ * Created by Benjamin Glover on 2/3/2016.
+ *
+ *
+ * Resources:
+ *
+ * Using Async task to fetch data in the background
+ * http://stackoverflow.com/questions/20017448/android-app-force-close-when-sending-data-to-local-webserver-from-android
+ *
+ * Pulling and parsing RSS Feed data into Lists
+ * http://jmsliu.com/1508/rss-reader-android-app-tutorial-3-parse-xml-in-android.html
+ * Better input stream for url connections
+ * http://stackoverflow.com/questions/20017448/android-app-force-close-when-sending-data-to-local-webserver-from-android
+ *
+ *
  */
+
+//TODO Use Async Properly
+    //TODO Make the class able to accept rss feeds dynamically
+
 public class ParseRSS extends AsyncTask<String , String, Boolean>{
     private List<String> mHeadlines;
     private List<String> mLinks;
@@ -41,9 +58,7 @@ public class ParseRSS extends AsyncTask<String , String, Boolean>{
         boolean retVal = false;
         try {
             URL url = new URL("http://www.clemson.edu/media-relations/rss.php?cat_id=2");
-            if(url == null){
-                Log.d("Debug", "Url is not valid");
-            }
+
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10 * 1000);
             conn.setConnectTimeout(10 * 1000);
@@ -60,14 +75,6 @@ public class ParseRSS extends AsyncTask<String , String, Boolean>{
 
             xpp.setInput(inputStream, "UTF_8");
 
-        /* We will parse the XML content looking for the "<title>" tag which appears inside the "<item>" tag.
-         * However, we should take in consideration that the rss feed name also is enclosed in a "<title>" tag.
-         * As we know, every feed begins with these lines: "<channel><title>Feed_Name</title>...."
-         * so we should skip the "<title>" tag which is a child of "<channel>" tag,
-         * and take in consideration only "<title>" tag which is a child of "<item>"
-         *
-         * In order to achieve this, we will make use of a boolean variable.
-         */
             boolean insideItem = false;
 
             // Returns the type of current event: START_TAG, END_TAG, etc..
