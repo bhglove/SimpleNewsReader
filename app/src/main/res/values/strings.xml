@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Clemson News</string>
     <string name="action_settings">Settings</string>
+    <string name="button_news_feed">News Feed</string>
+    <string name="button_news_cat">Categories</string>
+    <string name="button_add_cat">Add Category</string>
 </resources>

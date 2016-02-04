@@ -44,10 +44,8 @@ import java.util.Random;
  *
  */
 public class MainActivity extends AppCompatActivity{
-    //TODO Move the rss list view into a different activity
-    private ListView mListView;
-    private List<String> list;
-    private ArrayAdapter<String> mArrayAdapter;
+
+
     //TODO change the UI of the main activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,37 +55,21 @@ public class MainActivity extends AppCompatActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ParseRSS parse = new ParseRSS();
-        parse.execute("Okay");
-        list = parse.getmHeadlines();
-        Log.i("Entries", "We have " + list.size() + " entries");
-        //TODO Add list view
-        mListView = (ListView) findViewById(R.id.listView);
-
-        mArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, list){
-
+        Button newsFeedButton = (Button) findViewById(R.id.buttonNewsFeed);
+        newsFeedButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public View getView(int position, View convertView,
-                                ViewGroup parent) {
-                View view =super.getView(position, convertView, parent);
-
-                TextView textView=(TextView) view.findViewById(android.R.id.text1);
-
-            /*YOUR CHOICE OF COLOR*/
-                textView.setTextColor(Color.BLUE);
-
-                return view;
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, NewsFeed.class);
+                startActivity(intent);
             }
-        };
+        });
 
-        mListView.setAdapter(mArrayAdapter);
-
-        //TODO Add more rss feeds by floating action button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        Button categoryButton = (Button) findViewById(R.id.buttonNewsCat);
+        categoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                mArrayAdapter.notifyDataSetChanged();
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, Main2Activity.class);
+                startActivity(intent);
             }
         });
 

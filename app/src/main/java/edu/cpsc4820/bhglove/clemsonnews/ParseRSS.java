@@ -2,6 +2,7 @@ package edu.cpsc4820.bhglove.clemsonnews;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ProgressBar;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -33,78 +34,85 @@ import java.util.List;
  */
 
 //TODO Use Async Properly
-    //TODO Make the class able to accept rss feeds dynamically
 
-public class ParseRSS extends AsyncTask<String , String, Boolean>{
+public class ParseRSS extends AsyncTask<String , Integer, String>{
     private List<String> mHeadlines;
     private List<String> mLinks;
 
     public ParseRSS(){
         mHeadlines = (List) new ArrayList<String>();
         mLinks = (List) new ArrayList<String>();
-
     }
 
     @Override
-    protected Boolean doInBackground(String... params) {
-       return getRSSList();
+    protected String doInBackground(String... params) {
+
+        getRSSList(params);
+
+        return "Task Completed.";
     }
 
     public List<String> getmHeadlines(){
         return mHeadlines;
     }
 
-    private boolean getRSSList(){
+    private boolean getRSSList(String[] feed){
         boolean retVal = false;
-        try {
-            URL url = new URL("http://www.clemson.edu/media-relations/rss.php?cat_id=2");
 
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10 * 1000);
-            conn.setConnectTimeout(10 * 1000);
-            conn.setRequestMethod("GET");
-            conn.setDoInput(true);
+        for(int i = 0; i < feed.length; i++) {
+            try {
+                URL url = new URL(feed[i]);
 
-            InputStream inputStream = conn.getInputStream();
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(10 * 1000);
+                conn.setConnectTimeout(10 * 1000);
+                conn.setRequestMethod("GET");
+                conn.setDoInput(true);
 
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            factory.setNamespaceAware(false);
-            XmlPullParser xpp = factory.newPullParser();
+                InputStream inputStream = conn.getInputStream();
 
-            // We will get the XML from an input stream
+                XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+                factory.setNamespaceAware(false);
+                XmlPullParser xpp = factory.newPullParser();
 
-            xpp.setInput(inputStream, "UTF_8");
+                // We will get the XML from an input stream
 
-            boolean insideItem = false;
+                xpp.setInput(inputStream, "UTF_8");
 
-            // Returns the type of current event: START_TAG, END_TAG, etc..
-            int eventType = xpp.getEventType();
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                if (eventType == XmlPullParser.START_TAG) {
+                boolean insideItem = false;
 
-                    if (xpp.getName().equalsIgnoreCase("item")) {
-                        insideItem = true;
-                    } else if (xpp.getName().equalsIgnoreCase("title")) {
-                        if (insideItem)
-                            mHeadlines.add(xpp.nextText()); //extract the headline
-                    } else if (xpp.getName().equalsIgnoreCase("link")) {
-                        if (insideItem)
-                            mLinks.add(xpp.nextText()); //extract the link of article
+                // Returns the type of current event: START_TAG, END_TAG, etc..
+                int eventType = xpp.getEventType();
+                while (eventType != XmlPullParser.END_DOCUMENT) {
+                    if (eventType == XmlPullParser.START_TAG) {
+
+                        if (xpp.getName().equalsIgnoreCase("item")) {
+                            insideItem = true;
+                        } else if (xpp.getName().equalsIgnoreCase("title")) {
+                            if (insideItem)
+                                mHeadlines.add(xpp.nextText()); //extract the headline
+                        } else if (xpp.getName().equalsIgnoreCase("link")) {
+                            if (insideItem)
+                                mLinks.add(xpp.nextText()); //extract the link of article
+                        }
+                    } else if (eventType == XmlPullParser.END_TAG && xpp.getName().equalsIgnoreCase("item")) {
+                        insideItem = false;
                     }
-                }else if(eventType==XmlPullParser.END_TAG && xpp.getName().equalsIgnoreCase("item")){
-                    insideItem=false;
+
+                    eventType = xpp.next(); //move to next element
+                    retVal = true;
                 }
 
-                eventType = xpp.next(); //move to next element
-                retVal = true;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                retVal = false;
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+                retVal = false;
+            } catch (IOException e) {
+                e.printStackTrace();
+                retVal = false;
             }
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         return  retVal;

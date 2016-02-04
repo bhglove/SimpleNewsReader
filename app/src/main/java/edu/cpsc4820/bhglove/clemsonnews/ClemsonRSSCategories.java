@@ -18,6 +18,15 @@ import android.provider.UserDictionary;
 public enum ClemsonRSSCategories {
     UNIVERSITY, ACADEMICS, RESEARCH, PEOPLE, SERVICE, EVENTS, STUDENTS, FACULTY, ALUMI, CES;
 
+  static String[] allFeeds(){
+      String[] feeds = new String[ClemsonRSSCategories.values().length];
+      int i = 0;
+      for(ClemsonRSSCategories cat : ClemsonRSSCategories.values()){
+          feeds[i] = cat.toFeed();
+          i++;
+      }
+      return feeds;
+  }
 
   public String toFeed(){
       switch (this){
