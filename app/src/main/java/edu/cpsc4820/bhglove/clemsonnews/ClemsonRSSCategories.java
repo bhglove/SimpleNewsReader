@@ -1,7 +1,5 @@
 package edu.cpsc4820.bhglove.clemsonnews;
 
-import android.provider.UserDictionary;
-
 /**
  * Maps the rss feed of a news category to a logical name.
  *
@@ -16,7 +14,7 @@ import android.provider.UserDictionary;
  */
 
 public enum ClemsonRSSCategories {
-    UNIVERSITY, ACADEMICS, RESEARCH, PEOPLE, SERVICE, EVENTS, STUDENTS, FACULTY, ALUMI, CES;
+    MAIN, UNIVERSITY, ACADEMICS, RESEARCH, PEOPLE, SERVICE, EVENTS, STUDENTS, FACULTY, ALUMNI, CES;
 
   static String[] allFeeds(){
       String[] feeds = new String[ClemsonRSSCategories.values().length];
@@ -30,6 +28,8 @@ public enum ClemsonRSSCategories {
 
   public String toFeed(){
       switch (this){
+          case MAIN:
+              return "http://newsstand.clemson.edu/feed/";
           case UNIVERSITY:
             return "http://www.clemson.edu/media-relations/rss.php?cat_id=2";
           case ACADEMICS:
@@ -46,7 +46,7 @@ public enum ClemsonRSSCategories {
               return "http://www.clemson.edu/media-relations/rss.php?tag=students";
           case FACULTY:
               return "http://www.clemson.edu/media-relations/rss.php?tag=faculty-staff";
-          case ALUMI:
+          case ALUMNI:
               return "http://www.clemson.edu/media-relations/rss.php?tag=alumni";
           case CES:
             return "http://www.clemson.edu/media-relations/rss.php?tag=CES";

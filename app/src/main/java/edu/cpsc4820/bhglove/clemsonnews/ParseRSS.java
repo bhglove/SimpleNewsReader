@@ -14,7 +14,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Benjamin Glover on 2/3/2016.
@@ -36,12 +35,19 @@ import java.util.List;
 //TODO Use Async Properly
 
 public class ParseRSS extends AsyncTask<String , Integer, String>{
-    private List<String> mHeadlines;
-    private List<String> mLinks;
+    private ArrayList<String> mHeadlines;
+    private ArrayList<String> mLinks;
+    private ArrayList<String> mDescription;
+    private ProgressBar progressBar;
 
     public ParseRSS(){
-        mHeadlines = (List) new ArrayList<String>();
-        mLinks = (List) new ArrayList<String>();
+        mHeadlines = (ArrayList) new ArrayList<String>();
+        mLinks = (ArrayList) new ArrayList<String>();
+        mDescription = (ArrayList) new ArrayList<String>();
+    }
+
+    public void setProgressBar(ProgressBar progressBar){
+        this.progressBar = progressBar;
     }
 
     @Override
@@ -52,13 +58,16 @@ public class ParseRSS extends AsyncTask<String , Integer, String>{
         return "Task Completed.";
     }
 
-    public List<String> getmHeadlines(){
+    public ArrayList<String> getmHeadlines(){
         return mHeadlines;
+    }
+    public ArrayList<String> getmLinks(){
+        return mLinks;
     }
 
     private boolean getRSSList(String[] feed){
         boolean retVal = false;
-
+        Log.d("Feed", "There are " + feed.length + " selected feeds");
         for(int i = 0; i < feed.length; i++) {
             try {
                 URL url = new URL(feed[i]);
@@ -94,6 +103,9 @@ public class ParseRSS extends AsyncTask<String , Integer, String>{
                         } else if (xpp.getName().equalsIgnoreCase("link")) {
                             if (insideItem)
                                 mLinks.add(xpp.nextText()); //extract the link of article
+                        } else if (xpp.getName().equalsIgnoreCase("description")) {
+                            if(insideItem)
+                                mDescription.add(xpp.nextText()); //extract the category
                         }
                     } else if (eventType == XmlPullParser.END_TAG && xpp.getName().equalsIgnoreCase("item")) {
                         insideItem = false;
@@ -114,7 +126,13 @@ public class ParseRSS extends AsyncTask<String , Integer, String>{
                 retVal = false;
             }
         }
-
+        Log.d("Feed", "Finishing feed grab with " + mHeadlines.size() + " headlines");
         return  retVal;
+    }
+
+
+
+    public ArrayList<String> getmDescription() {
+        return mDescription;
     }
 }

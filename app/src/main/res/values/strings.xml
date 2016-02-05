@@ -4,4 +4,7 @@
     <string name="button_news_feed">News Feed</string>
     <string name="button_news_cat">Categories</string>
     <string name="button_add_cat">Add Category</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

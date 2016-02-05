@@ -1,32 +1,27 @@
 package edu.cpsc4820.bhglove.clemsonnews;
 
+import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.AsyncTask.Status;
-import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MotionEvent;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static android.view.MotionEvent.*;
 
 public class NewsFeed extends AppCompatActivity {
     private ListView mListView;
-    private List<String> list;
+    private ArrayList<String> headlines;
+    private ArrayList<String> links;
+    private ArrayList<String> description;
     private ArrayAdapter<String> mArrayAdapter;
+
+    private DataModel mData = DataModel.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,22 +33,20 @@ public class NewsFeed extends AppCompatActivity {
         ParseRSS parse = new ParseRSS();
 
         try {
-            parse.execute(ClemsonRSSCategories.allFeeds());
+            parse.execute(mData.getAllSelectedFeed());
 
-            parse.get(1000 * 5, TimeUnit.MILLISECONDS);
+            parse.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
         }
 
-        list = parse.getmHeadlines();
+        headlines = parse.getmHeadlines();
+        links = parse.getmLinks();
+        description = parse.getmDescription();
 
-
-
-        mArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, list){
+        mArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, headlines){
 
             @Override
             public View getView(int position, View convertView,
@@ -71,6 +64,18 @@ public class NewsFeed extends AppCompatActivity {
 
 
         mListView.setAdapter(mArrayAdapter);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(NewsFeed.this, ArticleActivity.class);
+                intent.putExtra("Headline", headlines.get(position).toString());
+                intent.putExtra("Link", links.get(position).toString());
+                intent.putExtra("Description", description.get(position).toString());
+                startActivity(intent);
+
+            }
+        });
 
     }
 }

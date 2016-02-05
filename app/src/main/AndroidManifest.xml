@@ -21,7 +21,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".NewsFeed" />
-        <activity android:name=".Main2Activity"></activity>
+        <activity android:name=".SelectCategory" />
+        <activity android:name=".ArticleActivity"></activity>
     </application>
 
 </manifest>
