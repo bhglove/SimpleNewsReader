@@ -20,6 +20,7 @@ public class ArticleActivity extends AppCompatActivity {
     private WebView mWebView;
     private TextView mDescription;
 
+    //Make full webview
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
