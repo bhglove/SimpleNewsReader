@@ -17,8 +17,13 @@ import android.widget.Button;
  * Quickly override listview font
  * http://stackoverflow.com/questions/4533440/android-listview-text-color
  *
+ * Override Back Button
+ *  - Our TA Sean
+ * http://stackoverflow.com/questions/2354336/android-pressing-back-button-should-exit-the-app
+ *
  */
 public class MainActivity extends AppCompatActivity{
+
     //TODO change the UI of the main activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,14 +42,7 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-        Button categoryButton = (Button) findViewById(R.id.buttonNewsCat);
-        categoryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, SelectCategory.class);
-                startActivity(intent);
-            }
-        });
+        //TODO You're going to want this to be empty for adding permissions in 6.0
 
         //TODO Check to make sure phone has internet
     }
