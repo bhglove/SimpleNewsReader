@@ -67,7 +67,8 @@ public class SelectCategory extends AppCompatActivity {
             mEmptyText.setVisibility(View.VISIBLE);
         }
         else{
-            mEmptyText.setVisibility(View.INVISIBLE);
+            mEmptyText.setText(R.string.selected);
+            mEmptyText.setVisibility(View.VISIBLE);
             mListView.setVisibility(View.VISIBLE);
         }
 
@@ -139,6 +140,10 @@ public class SelectCategory extends AppCompatActivity {
                                     data.addToAvailableFeed(data.getmListSelected().get(position).toString());
                                     mAdapter.notifyDataSetChanged();
                                     dialog.dismiss();
+                                    if (data.getmListSelected().size() == 0) {
+                                        mEmptyText.setText("List is empty");
+                                        mEmptyText.setVisibility(View.VISIBLE);
+                                    }
                                 }
                             });
 
@@ -184,7 +189,8 @@ public class SelectCategory extends AppCompatActivity {
                         adapter.notifyDataSetChanged();
                         mAdapter.notifyDataSetChanged();
                         mListView.setVisibility(View.VISIBLE);
-                        mEmptyText.setVisibility(View.INVISIBLE);
+                        mEmptyText.setText(R.string.selected);
+                        mEmptyText.setVisibility(View.VISIBLE);
                         dialog.dismiss();
                     }
                 });
@@ -223,7 +229,8 @@ public class SelectCategory extends AppCompatActivity {
                                                 if (!title.isEmpty() && !link.isEmpty()) {
                                                     data.createNewFeed(title, link);
                                                     if (data.getmListSelected().size() == 0) {
-                                                        mEmptyText.setVisibility(View.INVISIBLE);
+                                                        mEmptyText.setText(R.string.selected);
+                                                        mEmptyText.setVisibility(View.VISIBLE);
                                                     }
                                                     data.getmListSelected().add(title);
                                                     mAdapter.notifyDataSetChanged();

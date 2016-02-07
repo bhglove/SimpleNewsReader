@@ -1,21 +1,25 @@
 package edu.cpsc4820.bhglove.simplenewsreader;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class NewsFeed extends AppCompatActivity {
     private ListView mListView;
 
-    //TODO Use data model to store headlines, links, and descriptions
+
     private DataModel mData = DataModel.getInstance();
 
-    //TODO Add button to start CategoryActivity
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +30,25 @@ public class NewsFeed extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(NewsFeed.this, SelectCategory.class);
                 startActivity(intent);
+            }
+        });
+        ImageButton infoButton = (ImageButton) findViewById(R.id.infoButton);
+        infoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder infoBuilder = new AlertDialog.Builder(NewsFeed.this);
+                infoBuilder.setTitle("About Simple News Reader");
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    infoBuilder.setView(R.layout.about_layout);
+                }
+                else{
+                    infoBuilder.setMessage("Please refer to" +
+                            "http://people.cs.clemson.edu/~bhglove/CPSC482/Assignment/assingment2.html."
+                           + "Sorry about the inconvience."
+                    ); }
+
+                infoBuilder.create().show();
             }
         });
         createListView();
@@ -43,6 +66,15 @@ public class NewsFeed extends AppCompatActivity {
         mListView = (ListView) findViewById(R.id.newsFeedView);
         ArrayAdapter<String> adapter = mData.createNewsFeedAdapter(getApplicationContext());
         mListView.setAdapter(adapter);
+        TextView empty = (TextView) findViewById(R.id.emptyNewsFeed);
+        if(adapter.isEmpty()){
+            mListView.setVisibility(View.INVISIBLE);
+            empty.setVisibility(View.VISIBLE);
+        }
+        else{
+            mListView.setVisibility(View.VISIBLE);
+            empty.setVisibility(View.INVISIBLE);
+        }
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

@@ -148,8 +148,7 @@ public class DataModel {
         ArrayAdapter mArrayAdapter;
 
         getData();
-        //TODO Display Readable names
-        //TODO Change Simple List to #2 pass in DataModel
+
         mArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_2, android.R.id.text1, headlines) {
 
             @Override

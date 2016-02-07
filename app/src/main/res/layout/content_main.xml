@@ -12,22 +12,4 @@
     tools:context="edu.cpsc4820.bhglove.simplenewsreader.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <Button
-        android:id="@+id/buttonNewsFeed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textTitleMain"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="151dp"
-        android:text="@string/button_news_feed" />
-
-    <TextView
-        android:id="@+id/textTitleMain"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="38dp"
-        android:text="@string/app_name"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
 </RelativeLayout>
