@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class SelectCategory extends AppCompatActivity {
     private ListView mListView;
@@ -75,25 +76,27 @@ public class SelectCategory extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 final AlertDialog.Builder optionsBuilder = new AlertDialog.Builder(SelectCategory.this);
-                String title = PopularFeeds.valueOf(data.getmListSelected().get(position).toString()).toReadableString();
+                //String title = PopularFeeds.valueOf(data.getmListSelected().get(position).toString()).toReadableString();
+                String title = data.getmListSelected().get(position).toString();
                 optionsBuilder.setTitle("Options for " + title);
 
                 optionsBuilder.setItems(new String[]{"Edit", "Delete"}, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String item = data.getmListSelected().get(position).toString();
+                        final String item = data.getmListSelected().get(position).toString();
                         if (which == 0) {
                             AlertDialog.Builder editBuilder = new AlertDialog.Builder(SelectCategory.this);
                             TextView rssTitleLabel = new TextView(SelectCategory.this);
                             TextView rssLinkLabel = new TextView(SelectCategory.this);
-                            EditText rssTitle = new EditText(SelectCategory.this);
-                            EditText rssLink = new EditText(SelectCategory.this);
+                            final EditText rssTitle = new EditText(SelectCategory.this);
+                            final EditText rssLink = new EditText(SelectCategory.this);
 
                             editBuilder.setTitle("Edit");
 
-                            String title = PopularFeeds.valueOf(item).toReadableString();
-                            String feed = PopularFeeds.valueOf(item).toFeed();
-
+                            //String title = PopularFeeds.valueOf(item).toReadableString();
+                            //String feed = PopularFeeds.valueOf(item).toFeed();
+                            String title = item;
+                            String feed = data.findLink(title);
                             rssTitle.setText(title);
                             rssLink.setText(feed);
                             rssTitle.setTextColor(Color.BLACK);
@@ -114,7 +117,12 @@ public class SelectCategory extends AppCompatActivity {
                             editBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-
+                                    String title = rssTitle.getText().toString();
+                                    String link = rssLink.getText().toString();
+                                    if (!title.isEmpty() && !link.isEmpty()) {
+                                        data.editFeed(item, title, link);
+                                        mAdapter.notifyDataSetChanged();
+                                    }
                                 }
                             });
                             editBuilder.setNegativeButton("Cancel", null);
@@ -123,7 +131,7 @@ public class SelectCategory extends AppCompatActivity {
                         if (which == 1) {
                             AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(SelectCategory.this);
                             deleteBuilder.setTitle("Confirm Delete");
-                            deleteBuilder.setMessage("Are you sure you want to delete " + item.toLowerCase() + " feed?");
+                            deleteBuilder.setMessage("Are you sure you want to delete " + item + " feed?");
                             deleteBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -181,36 +189,55 @@ public class SelectCategory extends AppCompatActivity {
                     }
                 });
                 dialogBuilder.setNeutralButton("Add Custom RSS Feed", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SelectCategory.this);
-                        dialogBuilder.setTitle("Add Custom RSS");
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SelectCategory.this);
+                                dialogBuilder.setTitle("Add Custom RSS");
 
-                        EditText rssTitle = new EditText(getApplicationContext());
+                                final EditText rssTitle = new EditText(getApplicationContext());
 
-                        rssTitle.setHint("Feed Name");
-                        rssTitle.setTextColor(Color.BLACK);
-                        rssTitle.setHintTextColor(Color.GRAY);
-
-
-                        EditText rssLink = new EditText(getApplicationContext());
-                        rssLink.setHint("Feed Link");
-                        rssLink.setTextColor(Color.BLACK);
-                        rssLink.setHintTextColor(Color.GRAY);
+                                rssTitle.setHint("Feed Name");
+                                rssTitle.setTextColor(Color.BLACK);
+                                rssTitle.setHintTextColor(Color.GRAY);
 
 
-                        LinearLayout layout = new LinearLayout(getApplicationContext());
-                        layout.setOrientation(LinearLayout.VERTICAL);
-                        layout.setGravity(Gravity.CENTER_VERTICAL);
-                        layout.addView(rssTitle);
-                        layout.addView(rssLink);
+                                final EditText rssLink = new EditText(getApplicationContext());
+                                rssLink.setHint("Feed Link");
+                                rssLink.setTextColor(Color.BLACK);
+                                rssLink.setHintTextColor(Color.GRAY);
 
-                        dialogBuilder.setView(layout);
-                        dialogBuilder.setNegativeButton("Cancel", null);
-                        dialogBuilder.setPositiveButton("Add", null);
-                        dialogBuilder.show();
-                    }
-                });
+
+                                LinearLayout layout = new LinearLayout(getApplicationContext());
+                                layout.setOrientation(LinearLayout.VERTICAL);
+                                layout.setGravity(Gravity.CENTER_VERTICAL);
+                                layout.addView(rssTitle);
+                                layout.addView(rssLink);
+
+                                dialogBuilder.setView(layout);
+                                dialogBuilder.setNegativeButton("Cancel", null);
+                                dialogBuilder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                String title = rssTitle.getText().toString();
+                                                String link = rssLink.getText().toString();
+                                                if (!title.isEmpty() && !link.isEmpty()) {
+                                                    data.createNewFeed(title, link);
+                                                    if (data.getmListSelected().size() == 0) {
+                                                        mEmptyText.setVisibility(View.INVISIBLE);
+                                                    }
+                                                    data.getmListSelected().add(title);
+                                                    mAdapter.notifyDataSetChanged();
+                                                    Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        }
+
+                                );
+                                dialogBuilder.show();
+                            }
+                        }
+
+                );
 
                 dialogBuilder.create();
                 dialogBuilder.show();

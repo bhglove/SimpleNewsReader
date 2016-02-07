@@ -40,6 +40,7 @@ public class DataModel {
     private ArrayList<String> description;
     private ArrayList mListSelected;   //This is the selected feeds the user wants to display on the news feed
     private ArrayList mListAvailable;
+    private Feeds feedList;
 
    private DataModel(){
        headlines = new ArrayList<String>();
@@ -48,14 +49,33 @@ public class DataModel {
        mListAvailable = new ArrayList<String>();
        mListSelected = new ArrayList<String>();
 
-       for (PopularFeeds cat : PopularFeeds.values())
-           mListAvailable.add(cat.toString());
+       feedList = new Feeds();
+       for(String s : feedList.getAllTitles()){
+           mListAvailable.add(s);
+       }
+
    }
 
     public static DataModel getInstance(){
         if(mData == null) mData = new DataModel();
 
         return mData;
+    }
+
+    public void createNewFeed(String title, String link){
+        feedList.addFeed(title, link);
+    }
+
+    public void editFeed(String oldTitle, String title, String link){
+        if(mListSelected.contains(oldTitle)){
+            mListSelected.remove(oldTitle);
+            mListSelected.add(title);
+        }
+        feedList.editFeed(oldTitle, title, link);
+    }
+
+    public String findLink(String title){
+        return feedList.findLink(title);
     }
 
     public void addToSelectedFeed(String value){
@@ -93,7 +113,10 @@ public class DataModel {
     public String[] getAllSelectedFeed(){
         String [] feed = new String[mListSelected.size()];
         for(int i = 0; i < mListSelected.size(); i++)
-            feed[i] = PopularFeeds.valueOf(mListSelected.get(i).toString()).toFeed();
+            feed[i] = feedList.findLink(mListSelected.get(i).toString());
+            //Deprecated
+            //feed[i] = PopularFeeds.valueOf(mListSelected.get(i).toString()).toFeed();
+
         return feed;
     }
 
