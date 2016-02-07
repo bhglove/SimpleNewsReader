@@ -1,4 +1,4 @@
-package edu.cpsc4820.bhglove.clemsonnews;
+package edu.cpsc4820.bhglove.simplenewsreader;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

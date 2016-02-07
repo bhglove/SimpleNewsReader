@@ -1,4 +1,4 @@
-package edu.cpsc4820.bhglove.clemsonnews;
+package edu.cpsc4820.bhglove.simplenewsreader;
 
 /**
  * Created by Benjios on 2/6/2016.
