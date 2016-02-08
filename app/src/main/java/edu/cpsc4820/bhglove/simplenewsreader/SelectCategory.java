@@ -19,6 +19,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/***
+ * Creates two listviews displaying the selected and available  RSS Feeds for the User.
+ */
 public class SelectCategory extends AppCompatActivity {
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
@@ -62,6 +65,8 @@ public class SelectCategory extends AppCompatActivity {
             }
         };
 
+
+        //Dispay a text view alerting the user that the list is empty.
         if(data.getmListSelected().isEmpty()){
             mEmptyText.setText("List is empty");
             mEmptyText.setVisibility(View.VISIBLE);
@@ -73,6 +78,8 @@ public class SelectCategory extends AppCompatActivity {
         }
 
         mListView.setAdapter(mAdapter);
+
+        //Alert for managing the RSS Feed
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -85,6 +92,8 @@ public class SelectCategory extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final String item = data.getmListSelected().get(position).toString();
+
+                        //** Creates a dialog for editing the selected RSS Feed. **/
                         if (which == 0) {
                             AlertDialog.Builder editBuilder = new AlertDialog.Builder(SelectCategory.this);
                             TextView rssTitleLabel = new TextView(SelectCategory.this);
@@ -96,6 +105,7 @@ public class SelectCategory extends AppCompatActivity {
 
                             //String title = PopularFeeds.valueOf(item).toReadableString();
                             //String feed = PopularFeeds.valueOf(item).toFeed();
+                            //** Formatting for the dialog text. **/
                             String title = item;
                             String feed = data.findLink(title);
                             rssTitle.setText(title);
@@ -106,7 +116,7 @@ public class SelectCategory extends AppCompatActivity {
                             rssTitleLabel.setText("RSS Title");
                             rssLinkLabel.setText("RSS Link");
 
-
+                            /** Formating for the layout of the dialog **/
                             LinearLayout layout = new LinearLayout(getApplicationContext());
                             layout.setOrientation(LinearLayout.VERTICAL);
                             layout.setGravity(Gravity.CENTER_VERTICAL);
@@ -129,11 +139,17 @@ public class SelectCategory extends AppCompatActivity {
                             editBuilder.setNegativeButton("Cancel", null);
                             editBuilder.show();
                         }
+                        /** End of edit dialog. **/
+
+                        /** Creates a dialog for deleting a RSS Feed **/
                         if (which == 1) {
                             AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(SelectCategory.this);
                             deleteBuilder.setTitle("Confirm Delete");
                             deleteBuilder.setMessage("Are you sure you want to delete " + item + " feed?");
+
+                            //Confirm Dialog to comfirm deletion.
                             deleteBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                /** Prompt the user for deletion. **/
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Log.d("Index", "Index at: " + position);
@@ -146,7 +162,7 @@ public class SelectCategory extends AppCompatActivity {
                                     }
                                 }
                             });
-
+                            //Cancel Button
                             deleteBuilder.setNegativeButton("Cancel", null);
                             //Closes the dialog for Builder
                             dialog.dismiss();
@@ -157,7 +173,7 @@ public class SelectCategory extends AppCompatActivity {
                 optionsBuilder.show();
             }
         });
-
+        /**Allows the user to add a RSS Feed using Alert Dialog */
         Button addButton = (Button) findViewById(R.id.buttonAddCat);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -243,9 +259,7 @@ public class SelectCategory extends AppCompatActivity {
                                 dialogBuilder.show();
                             }
                         }
-
                 );
-
                 dialogBuilder.create();
                 dialogBuilder.show();
             }

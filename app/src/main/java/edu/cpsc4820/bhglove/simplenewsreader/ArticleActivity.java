@@ -9,7 +9,9 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 /**
+ *Benjamin Glover 2/07/2016
  *
+ * This activity class displays a web page retrieved from the NewsFeed class as a large WebView.
  * Resources:
  *
  * Web View
@@ -28,7 +30,7 @@ public class ArticleActivity extends AppCompatActivity {
 
         webBar = (ProgressBar) findViewById(R.id.webProgressBar);
         Intent intent = getIntent();
-
+        //Retrieves the link clicked on NewsFeed activity
         String link = intent.getStringExtra("Link");
 
         mWebView = (WebView) findViewById(R.id.webView);
@@ -37,6 +39,7 @@ public class ArticleActivity extends AppCompatActivity {
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setLoadsImagesAutomatically(true);
 
+        /** Sets the progress bar to the appropriate loading time.*/
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {

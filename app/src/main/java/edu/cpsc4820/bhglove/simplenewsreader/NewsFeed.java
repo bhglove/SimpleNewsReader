@@ -13,6 +13,10 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+/**
+ * Displays the description and title of all articles in a ListView
+ *
+ */
 public class NewsFeed extends AppCompatActivity {
     private ListView mListView;
 
@@ -54,6 +58,7 @@ public class NewsFeed extends AppCompatActivity {
         createListView();
     }
 
+    // Overrides the back button to set NewsFeed as the new Main Screen
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -62,6 +67,9 @@ public class NewsFeed extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Populates a list view with the provided adapter from DataModel
+     */
     private void createListView() {
         mListView = (ListView) findViewById(R.id.newsFeedView);
         ArrayAdapter<String> adapter = mData.createNewsFeedAdapter(getApplicationContext());

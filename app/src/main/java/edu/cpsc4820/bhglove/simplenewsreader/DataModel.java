@@ -23,7 +23,13 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by Benjios on 2/4/2016.
+ * The DataModel class is a public class responsible for being the central hub of all data list,
+ * with use of a singleton. This class also acts as the mediator to NewsFeed and Feeds, by storing
+ * all list and adapters in this single class. DataModel first populates stored RSS feeds from the
+ * class Feed and then parses the information from that feed into three separate ArrayLists from the
+ * private class ParseRSS.
+ *
+ * Created by Benjamin Glover on 2/4/2016.
  *
  * Resources:
  *
@@ -35,13 +41,14 @@ import java.util.concurrent.ExecutionException;
 public class DataModel {
 
     private static DataModel mData = null;
-    private ArrayList<String> headlines;
-    private ArrayList<String> links;
-    private ArrayList<String> description;
+    private ArrayList<String> headlines; //The title of the articles
+    private ArrayList<String> links;     //The weblink of the article
+    private ArrayList<String> description; //A description of the article (Contains HTML data)
     private ArrayList mListSelected;   //This is the selected feeds the user wants to display on the news feed
     private ArrayList mListAvailable;
     private Feeds feedList;
 
+    /** Initialize variables and set the three preset RSS feeds. */
    private DataModel(){
        headlines = new ArrayList<String>();
        links = new ArrayList<String>();
@@ -56,16 +63,31 @@ public class DataModel {
 
    }
 
+    /** Returns a single instance of the static DataModel
+     *
+      * @return void
+     */
     public static DataModel getInstance(){
         if(mData == null) mData = new DataModel();
 
         return mData;
     }
 
+    /**
+     *  Mediator function that adds a new RSS Feed from class SelectCategory to the list in class Feeds
+     *  @param title
+     *  @param link
+     */
     public void createNewFeed(String title, String link){
         feedList.addFeed(title, link);
     }
 
+    /**
+     * Mediator function that allows the user to edit a created RSS Feed.
+     * @param oldTitle
+     * @param title
+     * @param link
+     */
     public void editFeed(String oldTitle, String title, String link){
         if(mListSelected.contains(oldTitle)){
             mListSelected.remove(oldTitle);
@@ -74,42 +96,79 @@ public class DataModel {
         feedList.editFeed(oldTitle, title, link);
     }
 
+    /**
+     * Mediator function that searches the list of RSS Feeds in class Feeds
+     * @param title
+     * @return
+     */
     public String findLink(String title){
         return feedList.findLink(title);
     }
 
+    /**
+     * Mediator function updates the added category to the selected category listview
+     * @param value
+     */
     public void addToSelectedFeed(String value){
         Log.d("Add", "Add to Selected" + value);
         mListSelected.add(value);
         mListAvailable.remove(value);
     }
 
+    /**
+     * Mediator function updates the added category to the available category listview
+     * @param value
+     */
     public void addToAvailableFeed(String value){
         Log.d("Add", "Add to Available" + value);
         mListAvailable.add(value);
         mListSelected.remove(value);
     }
 
+    /**
+     * Mediator function that allows SelectCategory to access all available RSS Feeds
+     * @return ArrayList
+     */
     public ArrayList getmListAvailable() {
         return mListAvailable;
     }
 
+    /**
+     * Mediator function that allows SelectCategory to access all user selected RSS Feeds
+     * @return ArrayList
+     */
     public ArrayList getmListSelected() {
         return mListSelected;
     }
 
+    /**
+     * Mediator function that returns the Titles for all articles
+     * @return ArrayList
+     */
     public ArrayList<String> getHeadlines() {
         return headlines;
     }
 
+    /**
+     * Mediator function that returns all Links for all articles
+     * @return ArrayList
+     */
     public ArrayList<String> getLinks() {
         return links;
     }
 
+    /**
+     * Mediator function that returns all Descriptions for all articles
+     * @return ArryList
+     */
     public ArrayList<String> getDescription() {
         return description;
     }
 
+    /**
+     * Mediator function that returns all of the feed links to selected feeds.
+     * @return String[]
+     */
     public String[] getAllSelectedFeed(){
         String [] feed = new String[mListSelected.size()];
         for(int i = 0; i < mListSelected.size(); i++)
@@ -144,6 +203,11 @@ public class DataModel {
         description = mParseRss.getmDescription();
     }
 
+    /**
+     * Returns the adapter needed for the NewsFeed ListView. Sets a description and article title.
+     * @param context
+     * @return ArrayAdapter
+     */
     public ArrayAdapter createNewsFeedAdapter(Context context) {
         ArrayAdapter mArrayAdapter;
 
@@ -171,6 +235,7 @@ public class DataModel {
     }
 
     /**
+     * Private class used to Parse RSS Feeds
      * Created by Benjamin Glover on 2/3/2016.
      * <p/>
      * <p/>
@@ -219,6 +284,11 @@ public class DataModel {
             return mLinks;
         }
 
+        /**
+         * This function parses a list of RSS Feeds and set three ArrayList to appropriate values
+         * @param feed
+         * @return boolean
+         */
         private boolean getRSSList(String[] feed) {
             boolean retVal = false;
             Log.d("Feed", "There are " + feed.length + " selected feeds");
