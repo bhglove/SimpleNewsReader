@@ -18,7 +18,7 @@
     <string name="about_text_1">Add a new source of information from either a
         provided sample of RSS feeds or enter your own by pressing the "Add Category" button.\n
         After a new source is entered into the list, press the back button to return to the News Feed.\n
-        There, the articles will populate and are able to be clicked and view.\n\nEnjoy your readings!</string>
+        There, the articles will populate and able to be clicked and view.\n\nEnjoy your readings!</string>
     <string name="about_text_2">
         Web View\n
         http://developer.android.com/intl/zh-tw/reference/android/webkit/WebView.html\n\n
