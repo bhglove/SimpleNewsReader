@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 /**
+ * Deprecated as of 2/7/2016
+ *
  * The DataModel class is a public class responsible for being the central hub of all data list,
  * with use of a singleton. This class also acts as the mediator to NewsFeed and Feeds, by storing
  * all list and adapters in this single class. DataModel first populates stored RSS feeds from the
@@ -74,7 +76,7 @@ public class DataModel {
     }
 
     /**
-     *  Mediator function that adds a new RSS Feed from class SelectCategory to the list in class Feeds
+     *  Mediator function that adds a new RSS Feed from class Subscription to the list in class Feeds
      *  @param title
      *  @param link
      */
@@ -126,7 +128,7 @@ public class DataModel {
     }
 
     /**
-     * Mediator function that allows SelectCategory to access all available RSS Feeds
+     * Mediator function that allows Subscription to access all available RSS Feeds
      * @return ArrayList
      */
     public ArrayList getmListAvailable() {
@@ -134,7 +136,7 @@ public class DataModel {
     }
 
     /**
-     * Mediator function that allows SelectCategory to access all user selected RSS Feeds
+     * Mediator function that allows Subscription to access all user selected RSS Feeds
      * @return ArrayList
      */
     public ArrayList getmListSelected() {
@@ -237,10 +239,7 @@ public class DataModel {
     /**
      * Private class used to Parse RSS Feeds
      * Created by Benjamin Glover on 2/3/2016.
-     * <p/>
-     * <p/>
      * Resources:
-     * <p/>
      * Using Async task to fetch data in the background
      * http://stackoverflow.com/questions/20017448/android-app-force-close-when-sending-data-to-local-webserver-from-android
      * <p/>

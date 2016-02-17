@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name="edu.cpsc4820.bhglove.simplenewsreader.NewsFeed" />
-        <activity android:name="edu.cpsc4820.bhglove.simplenewsreader.SelectCategory" />
+        <activity android:name=".Subscription" />
         <activity android:name="edu.cpsc4820.bhglove.simplenewsreader.ArticleActivity"></activity>
     </application>
 

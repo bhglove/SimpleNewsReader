@@ -20,9 +20,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /***
+ * 2/17/2016 SelectCategory renamed to Subscription
+ *
  * Creates two listviews displaying the selected and available  RSS Feeds for the User.
  */
-public class SelectCategory extends AppCompatActivity {
+public class Subscription extends AppCompatActivity {
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
     private TextView mEmptyText;
@@ -30,7 +32,7 @@ public class SelectCategory extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(SelectCategory.this, NewsFeed.class);
+        Intent intent = new Intent(Subscription.this, NewsFeed.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         super.onBackPressed();
@@ -83,7 +85,7 @@ public class SelectCategory extends AppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                final AlertDialog.Builder optionsBuilder = new AlertDialog.Builder(SelectCategory.this);
+                final AlertDialog.Builder optionsBuilder = new AlertDialog.Builder(Subscription.this);
                 //String title = PopularFeeds.valueOf(data.getmListSelected().get(position).toString()).toReadableString();
                 String title = data.getmListSelected().get(position).toString();
                 optionsBuilder.setTitle("Options for " + title);
@@ -95,11 +97,11 @@ public class SelectCategory extends AppCompatActivity {
 
                         //** Creates a dialog for editing the selected RSS Feed. **/
                         if (which == 0) {
-                            AlertDialog.Builder editBuilder = new AlertDialog.Builder(SelectCategory.this);
-                            TextView rssTitleLabel = new TextView(SelectCategory.this);
-                            TextView rssLinkLabel = new TextView(SelectCategory.this);
-                            final EditText rssTitle = new EditText(SelectCategory.this);
-                            final EditText rssLink = new EditText(SelectCategory.this);
+                            AlertDialog.Builder editBuilder = new AlertDialog.Builder(Subscription.this);
+                            TextView rssTitleLabel = new TextView(Subscription.this);
+                            TextView rssLinkLabel = new TextView(Subscription.this);
+                            final EditText rssTitle = new EditText(Subscription.this);
+                            final EditText rssLink = new EditText(Subscription.this);
 
                             editBuilder.setTitle("Edit");
 
@@ -143,7 +145,7 @@ public class SelectCategory extends AppCompatActivity {
 
                         /** Creates a dialog for deleting a RSS Feed **/
                         if (which == 1) {
-                            AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(SelectCategory.this);
+                            AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(Subscription.this);
                             deleteBuilder.setTitle("Confirm Delete");
                             deleteBuilder.setMessage("Are you sure you want to delete " + item + " feed?");
 
@@ -179,7 +181,7 @@ public class SelectCategory extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SelectCategory.this);
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(Subscription.this);
                 dialogBuilder.setTitle("Select Category");
                 final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, data.getmListAvailable()) {
 
@@ -213,7 +215,7 @@ public class SelectCategory extends AppCompatActivity {
                 dialogBuilder.setNeutralButton("Add Custom RSS Feed", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SelectCategory.this);
+                                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(Subscription.this);
                                 dialogBuilder.setTitle("Add Custom RSS");
 
                                 final EditText rssTitle = new EditText(getApplicationContext());

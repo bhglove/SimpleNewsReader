@@ -32,7 +32,7 @@ public class NewsFeed extends AppCompatActivity {
         categoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(NewsFeed.this, SelectCategory.class);
+                Intent intent = new Intent(NewsFeed.this, Subscription.class);
                 startActivity(intent);
             }
         });
