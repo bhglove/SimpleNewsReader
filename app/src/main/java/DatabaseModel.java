@@ -19,10 +19,10 @@ public class DatabaseModel extends SQLiteOpenHelper{
     private static final String KEY_RSS_LINK = "LINK";
     private static final String KEY_RSS_AVAILABLE = "AVAILABLE";
 
-    private static final String TABLE_ARTICLES = "ARTICLES";
-    private static final String KEY_ARTICLES_ID = "_ID";
-    private static final String KEY_ARTICLES_RSS = "RSS_ID";
-    private static final String KEY_ARTICLES_CONTENT = "CONTENT_ID";
+    private static final String TABLE_RSS_CONTENT = "RSS_CONTENT";
+    private static final String KEY_RSS_CONTENT_ID = "_ID";
+    //KEY_RSS_ID
+    //KEY_CONTENT_ID
 
     private static final String TABLE_CONTENT = "CONTENT";
     private static final String KEY_CONTENT_ID = "_ID";
