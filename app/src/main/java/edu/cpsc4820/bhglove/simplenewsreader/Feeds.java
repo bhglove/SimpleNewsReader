@@ -1,5 +1,6 @@
 package edu.cpsc4820.bhglove.simplenewsreader;
 
+import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.util.ArrayList;

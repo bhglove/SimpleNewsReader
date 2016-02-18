@@ -1,3 +1,5 @@
+package edu.cpsc4820.bhglove.simplenewsreader;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
