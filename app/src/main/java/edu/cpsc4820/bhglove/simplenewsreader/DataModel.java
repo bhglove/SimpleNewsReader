@@ -111,7 +111,7 @@ public class DataModel {
      * Mediator function updates the added category to the selected category listview
      * @param value
      */
-    public void addToSelectedFeed(String value){
+    public void setSelected(String value){
         Log.d("Add", "Add to Selected" + value);
         mListSelected.add(value);
         mListAvailable.remove(value);
@@ -121,7 +121,7 @@ public class DataModel {
      * Mediator function updates the added category to the available category listview
      * @param value
      */
-    public void addToAvailableFeed(String value){
+    public void setAvailable(String value){
         Log.d("Add", "Add to Available" + value);
         mListAvailable.add(value);
         mListSelected.remove(value);
@@ -131,7 +131,7 @@ public class DataModel {
      * Mediator function that allows Subscription to access all available RSS Feeds
      * @return ArrayList
      */
-    public ArrayList getmListAvailable() {
+    public ArrayList getAvailable() {
         return mListAvailable;
     }
 
@@ -139,7 +139,7 @@ public class DataModel {
      * Mediator function that allows Subscription to access all user selected RSS Feeds
      * @return ArrayList
      */
-    public ArrayList getmListSelected() {
+    public ArrayList getSelected() {
         return mListSelected;
     }
 
@@ -163,7 +163,7 @@ public class DataModel {
      * Mediator function that returns all Descriptions for all articles
      * @return ArryList
      */
-    public ArrayList<String> getDescription() {
+    public ArrayList<String> getDescriptions() {
         return description;
     }
 
@@ -171,7 +171,7 @@ public class DataModel {
      * Mediator function that returns all of the feed links to selected feeds.
      * @return String[]
      */
-    public String[] getAllSelectedFeed(){
+    public String[] getAllSelected(){
         String [] feed = new String[mListSelected.size()];
         for(int i = 0; i < mListSelected.size(); i++)
             feed[i] = feedList.findLink(mListSelected.get(i).toString());
@@ -191,7 +191,7 @@ public class DataModel {
         ParseRSS mParseRss = new ParseRSS();
 
         try {
-            mParseRss.execute(mData.getAllSelectedFeed());
+            mParseRss.execute(mData.getAllSelected());
             mParseRss.get();
 
         } catch (InterruptedException e) {
@@ -228,7 +228,7 @@ public class DataModel {
                 textView1.setTextColor(Color.BLUE);
                 textView1.setText(mData.getHeadlines().get(position));
                 textView2.setTextColor(Color.GRAY);
-                textView2.setText(Html.fromHtml(mData.getDescription().get(position).replaceAll("(<(/)img>)|(<img.+?>)", "")).toString().trim());
+                textView2.setText(Html.fromHtml(mData.getDescriptions().get(position).replaceAll("(<(/)img>)|(<img.+?>)", "")).toString().trim());
 
                 return view;
             }

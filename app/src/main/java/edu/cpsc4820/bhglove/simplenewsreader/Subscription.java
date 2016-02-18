@@ -51,7 +51,7 @@ public class Subscription extends AppCompatActivity {
         mEmptyText.setVisibility(View.INVISIBLE);
 
         //Set the adapter for the selected feed list (on main screen)
-        mAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, data.getmListSelected()){
+        mAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, data.getSelected()){
 
             @Override
             public View getView(int position, View convertView,
@@ -69,7 +69,7 @@ public class Subscription extends AppCompatActivity {
 
 
         //Dispay a text view alerting the user that the list is empty.
-        if(data.getmListSelected().isEmpty()){
+        if(data.getSelected().isEmpty()){
             mEmptyText.setText("List is empty");
             mEmptyText.setVisibility(View.VISIBLE);
         }
@@ -86,14 +86,14 @@ public class Subscription extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 final AlertDialog.Builder optionsBuilder = new AlertDialog.Builder(Subscription.this);
-                //String title = PopularFeeds.valueOf(data.getmListSelected().get(position).toString()).toReadableString();
-                String title = data.getmListSelected().get(position).toString();
+                //String title = PopularFeeds.valueOf(data.getSelected().get(position).toString()).toReadableString();
+                String title = data.getSelected().get(position).toString();
                 optionsBuilder.setTitle("Options for " + title);
 
                 optionsBuilder.setItems(new String[]{"Edit", "Delete"}, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        final String item = data.getmListSelected().get(position).toString();
+                        final String item = data.getSelected().get(position).toString();
 
                         //** Creates a dialog for editing the selected RSS Feed. **/
                         if (which == 0) {
@@ -155,10 +155,10 @@ public class Subscription extends AppCompatActivity {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Log.d("Index", "Index at: " + position);
-                                    data.addToAvailableFeed(data.getmListSelected().get(position).toString());
+                                    data.setAvailable(data.getSelected().get(position).toString());
                                     mAdapter.notifyDataSetChanged();
                                     dialog.dismiss();
-                                    if (data.getmListSelected().size() == 0) {
+                                    if (data.getSelected().size() == 0) {
                                         mEmptyText.setText("List is empty");
                                         mEmptyText.setVisibility(View.VISIBLE);
                                     }
@@ -183,7 +183,7 @@ public class Subscription extends AppCompatActivity {
 
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(Subscription.this);
                 dialogBuilder.setTitle("Select Category");
-                final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, data.getmListAvailable()) {
+                final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, data.getAvailable()) {
 
                     @Override
                     public View getView(int position, View convertView,
@@ -203,7 +203,7 @@ public class Subscription extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        data.addToSelectedFeed(data.getmListAvailable().get(which).toString());
+                        data.setSelected(data.getAvailable().get(which).toString());
                         adapter.notifyDataSetChanged();
                         mAdapter.notifyDataSetChanged();
                         mListView.setVisibility(View.VISIBLE);
@@ -246,11 +246,11 @@ public class Subscription extends AppCompatActivity {
                                                 String link = rssLink.getText().toString();
                                                 if (!title.isEmpty() && !link.isEmpty()) {
                                                     data.createNewFeed(title, link);
-                                                    if (data.getmListSelected().size() == 0) {
+                                                    if (data.getSelected().size() == 0) {
                                                         mEmptyText.setText(R.string.selected);
                                                         mEmptyText.setVisibility(View.VISIBLE);
                                                     }
-                                                    data.getmListSelected().add(title);
+                                                    data.getSelected().add(title);
                                                     mAdapter.notifyDataSetChanged();
                                                     Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
                                                 }
