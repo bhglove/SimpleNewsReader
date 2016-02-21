@@ -34,6 +34,8 @@
         http://stackoverflow.com/questions/20017448/android-app-force-close-when-sending-data-to-local-webserver-from-android\n\n
     </string>
     <string name="about_text_3">RSS Parsing\nAsync Tasks\nWeb View</string>
+    <string name="title_activity_loading">LoadingActivity</string>
+    <string name="article_img">Article Picture</string>
 
 
 </resources>

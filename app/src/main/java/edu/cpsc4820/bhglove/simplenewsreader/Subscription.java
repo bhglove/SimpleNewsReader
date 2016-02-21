@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -42,8 +43,9 @@ public class Subscription extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select);
-
-        data = DataModel.getInstance();
+        if(data == null) {
+           data = DataModel.getInstance(getApplicationContext());
+        }
 
         mListView = (ListView) findViewById(R.id.categoryListView);
         mEmptyText = (TextView) findViewById(R.id.textView);
@@ -51,6 +53,7 @@ public class Subscription extends AppCompatActivity {
         mEmptyText.setVisibility(View.INVISIBLE);
 
         //Set the adapter for the selected feed list (on main screen)
+
         mAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, data.getSelected()){
 
             @Override
@@ -110,11 +113,14 @@ public class Subscription extends AppCompatActivity {
                             //** Formatting for the dialog text. **/
                             String title = item;
                             String feed = data.findLink(title);
+
+
                             rssTitle.setText(title);
                             rssLink.setText(feed);
                             rssTitle.setTextColor(Color.BLACK);
                             rssLink.setTextColor(Color.BLACK);
-
+                            rssTitle.setSelection(rssTitle.getText().toString().length());
+                            rssLink.setSelection(rssLink.getText().toString().length());
                             rssTitleLabel.setText("RSS Title");
                             rssLinkLabel.setText("RSS Link");
 
@@ -134,6 +140,8 @@ public class Subscription extends AppCompatActivity {
                                     String link = rssLink.getText().toString();
                                     if (!title.isEmpty() && !link.isEmpty()) {
                                         data.editFeed(item, title, link);
+                                        mAdapter.clear();
+                                        mAdapter.addAll(data.getSelected());
                                         mAdapter.notifyDataSetChanged();
                                     }
                                 }
@@ -155,8 +163,13 @@ public class Subscription extends AppCompatActivity {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Log.d("Index", "Index at: " + position);
+
                                     data.setAvailable(data.getSelected().get(position).toString());
+
+                                    mAdapter.clear();
+                                    mAdapter.addAll(data.getSelected());
                                     mAdapter.notifyDataSetChanged();
+
                                     dialog.dismiss();
                                     if (data.getSelected().size() == 0) {
                                         mEmptyText.setText("List is empty");
@@ -202,10 +215,17 @@ public class Subscription extends AppCompatActivity {
                 dialogBuilder.setSingleChoiceItems(adapter, 0, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        data.getSelected().add(data.getAvailable().get(which));
                         data.setSelected(data.getAvailable().get(which).toString());
-                        adapter.notifyDataSetChanged();
+
+                        mAdapter.clear();
+                        mAdapter.addAll(data.getSelected());
                         mAdapter.notifyDataSetChanged();
+
+                        adapter.clear();
+                        adapter.addAll(data.getAvailable());
+                        adapter.notifyDataSetChanged();
+
                         mListView.setVisibility(View.VISIBLE);
                         mEmptyText.setText(R.string.selected);
                         mEmptyText.setVisibility(View.VISIBLE);
@@ -246,12 +266,19 @@ public class Subscription extends AppCompatActivity {
                                                 String link = rssLink.getText().toString();
                                                 if (!title.isEmpty() && !link.isEmpty()) {
                                                     data.createNewFeed(title, link);
+
                                                     if (data.getSelected().size() == 0) {
                                                         mEmptyText.setText(R.string.selected);
                                                         mEmptyText.setVisibility(View.VISIBLE);
                                                     }
+
                                                     data.getSelected().add(title);
+                                                    data.setSelected(title);
+
+                                                    mAdapter.clear();
+                                                    mAdapter.addAll(data.getSelected());
                                                     mAdapter.notifyDataSetChanged();
+
                                                     Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
                                                 }
                                             }

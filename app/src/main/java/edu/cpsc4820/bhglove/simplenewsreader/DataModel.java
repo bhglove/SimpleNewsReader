@@ -1,13 +1,20 @@
 package edu.cpsc4820.bhglove.simplenewsreader;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -39,6 +46,7 @@ import java.util.concurrent.ExecutionException;
  * http://stackoverflow.com/questions/11178533/how-to-skip-image-tag-in-html-data-in-android?answertab=active#tab-top
  *
  *
+ *
  */
 public class DataModel {
 
@@ -49,19 +57,24 @@ public class DataModel {
     private ArrayList mListSelected;   //This is the selected feeds the user wants to display on the news feed
     private ArrayList mListAvailable;
     private Feeds feedList;
+    private DatabaseModel db = null;
+    private Context context;
 
     /** Initialize variables and set the three preset RSS feeds. */
-   private DataModel(){
+   private DataModel(Context context){
        headlines = new ArrayList<String>();
        links = new ArrayList<String>();
        description = new ArrayList<String>();
        mListAvailable = new ArrayList<String>();
        mListSelected = new ArrayList<String>();
+       this.context = context;
 
-       feedList = new Feeds();
-       for(String s : feedList.getAllTitles()){
-           mListAvailable.add(s);
+       if(db == null){
+           db = new DatabaseModel(context);
        }
+       feedList = new Feeds();
+       for(int i = 0; i < feedList.getAllTitles().length; i++)
+              db.createNewFeed(feedList.getTitleAt(i), feedList.getLinkAt(i));
 
    }
 
@@ -69,8 +82,8 @@ public class DataModel {
      *
       * @return void
      */
-    public static DataModel getInstance(){
-        if(mData == null) mData = new DataModel();
+    public static DataModel getInstance(Context context){
+        if(mData == null) mData = new DataModel(context);
 
         return mData;
     }
@@ -82,6 +95,7 @@ public class DataModel {
      */
     public void createNewFeed(String title, String link){
         feedList.addFeed(title, link);
+        db.createNewFeed(title, link);
     }
 
     /**
@@ -96,6 +110,7 @@ public class DataModel {
             mListSelected.add(title);
         }
         feedList.editFeed(oldTitle, title, link);
+        db.editFeed(oldTitle, title, link);
     }
 
     /**
@@ -104,7 +119,7 @@ public class DataModel {
      * @return
      */
     public String findLink(String title){
-        return feedList.findLink(title);
+        return db.findLink(title);
     }
 
     /**
@@ -112,9 +127,10 @@ public class DataModel {
      * @param value
      */
     public void setSelected(String value){
-        Log.d("Add", "Add to Selected" + value);
+        Log.d("Add", "Add to Selected " + value);
         mListSelected.add(value);
         mListAvailable.remove(value);
+        db.setSelected(value);
     }
 
     /**
@@ -122,9 +138,10 @@ public class DataModel {
      * @param value
      */
     public void setAvailable(String value){
-        Log.d("Add", "Add to Available" + value);
+        Log.d("Add", "Add to Available " + value);
         mListAvailable.add(value);
         mListSelected.remove(value);
+        db.setAvailable(value);
     }
 
     /**
@@ -132,6 +149,7 @@ public class DataModel {
      * @return ArrayList
      */
     public ArrayList getAvailable() {
+        mListAvailable = db.getAvailable();
         return mListAvailable;
     }
 
@@ -140,6 +158,7 @@ public class DataModel {
      * @return ArrayList
      */
     public ArrayList getSelected() {
+        mListSelected = db.getSelected();
         return mListSelected;
     }
 
@@ -148,6 +167,7 @@ public class DataModel {
      * @return ArrayList
      */
     public ArrayList<String> getHeadlines() {
+
         return headlines;
     }
 
@@ -172,13 +192,7 @@ public class DataModel {
      * @return String[]
      */
     public String[] getAllSelected(){
-        String [] feed = new String[mListSelected.size()];
-        for(int i = 0; i < mListSelected.size(); i++)
-            feed[i] = feedList.findLink(mListSelected.get(i).toString());
-            //Deprecated
-            //feed[i] = PopularFeeds.valueOf(mListSelected.get(i).toString()).toFeed();
-
-        return feed;
+       return db.getAllSelected();
     }
 
     public void setAllSelected(String[] selected) {
@@ -210,27 +224,36 @@ public class DataModel {
      * @param context
      * @return ArrayAdapter
      */
-    public ArrayAdapter createNewsFeedAdapter(Context context) {
+    public ArrayAdapter createNewsFeedAdapter(final Context context) {
         ArrayAdapter mArrayAdapter;
 
         getData();
 
-        mArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_2, android.R.id.text1, headlines) {
+        /**
+         * This array adapter uses a custom layout view to display an articles headline, description,
+         * and image thumbnail. The thumbnail should be roughly 100dp by 100dp.
+         * The original colors of the textviews were changed to blue for headlines and grey for
+         * article descriptions.
+         */
+        mArrayAdapter = new ArrayAdapter<String>(context, R.layout.article, headlines) {
 
             @Override
             public View getView(int position, View convertView,
                                 ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
+                if(convertView == null)
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.article, parent, false);
 
-                TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
-                TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
+                ImageView imageView = (ImageView) convertView.findViewById(R.id.article_imgview);
+                //TODO Aysnyc tasks to download one image for this View.
+                TextView textView1 = (TextView) convertView.findViewById(R.id.headline);
+                TextView textView2 = (TextView) convertView.findViewById(R.id.description);
                 /*YOUR CHOICE OF COLOR*/
                 textView1.setTextColor(Color.BLUE);
                 textView1.setText(mData.getHeadlines().get(position));
                 textView2.setTextColor(Color.GRAY);
                 textView2.setText(Html.fromHtml(mData.getDescriptions().get(position).replaceAll("(<(/)img>)|(<img.+?>)", "")).toString().trim());
 
-                return view;
+                return convertView;
             }
         };
         return mArrayAdapter;
@@ -254,25 +277,10 @@ public class DataModel {
         private ArrayList<String> mLinks;
         private ArrayList<String> mDescription;
 
-
         public ParseRSS() {
             mHeadlines = (ArrayList) new ArrayList<String>();
             mLinks = (ArrayList) new ArrayList<String>();
             mDescription = (ArrayList) new ArrayList<String>();
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            Log.i("Thread", "Background");
-            getRSSList(params);
-
-            return "Task Completed.";
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Log.i("Thread", "Pre Execute");
         }
 
         public ArrayList<String> getmHeadlines() {
@@ -281,6 +289,29 @@ public class DataModel {
 
         public ArrayList<String> getmLinks() {
             return mLinks;
+        }
+        public ArrayList<String> getmDescription() {
+            return mDescription;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.i("Thread", "Pre Execute");
+        }
+
+        @Override
+        protected void onPostExecute(String params) {
+            super.onPostExecute(params);
+
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            Log.i("Thread", "Background");
+            getRSSList(params);
+
+            return "Task Completed.";
         }
 
         /**
@@ -292,6 +323,7 @@ public class DataModel {
             boolean retVal = false;
             Log.d("Feed", "There are " + feed.length + " selected feeds");
             for (int i = 0; i < feed.length; i++) {
+                Log.d("Feed", "Parsing: " + feed[i]);
                 try {
                     URL url = new URL(feed[i]);
 
@@ -350,16 +382,6 @@ public class DataModel {
                 }
             }
             return retVal;
-        }
-
-        @Override
-        protected void onPostExecute(String params) {
-            super.onPostExecute(params);
-            Log.i("Thread", "Post Execute");
-        }
-
-        public ArrayList<String> getmDescription() {
-            return mDescription;
         }
     }
 
