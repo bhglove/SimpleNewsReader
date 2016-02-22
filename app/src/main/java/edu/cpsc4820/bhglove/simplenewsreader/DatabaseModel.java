@@ -97,6 +97,7 @@ public class DatabaseModel extends SQLiteOpenHelper{
         String WHERE = KEY_RSS_TITLE + "='" + oldTitle + "'";
         ContentValues values = new ContentValues();
         values.put(KEY_RSS_TITLE, title);
+        values.put(KEY_RSS_LINK, link);
         db.update(TABLE_RSS, values, WHERE, null);
         db.close();
     }

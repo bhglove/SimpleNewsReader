@@ -5,9 +5,13 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.text.Html;
+import android.text.Html.ImageGetter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +58,7 @@ public class DataModel {
     private ArrayList<String> headlines; //The title of the articles
     private ArrayList<String> links;     //The weblink of the article
     private ArrayList<String> description; //A description of the article (Contains HTML data)
+    private ArrayList<String> images;
     private ArrayList mListSelected;   //This is the selected feeds the user wants to display on the news feed
     private ArrayList mListAvailable;
     private Feeds feedList;
@@ -65,6 +70,7 @@ public class DataModel {
        headlines = new ArrayList<String>();
        links = new ArrayList<String>();
        description = new ArrayList<String>();
+       images = new ArrayList<String>();
        mListAvailable = new ArrayList<String>();
        mListSelected = new ArrayList<String>();
        this.context = context;
@@ -187,6 +193,10 @@ public class DataModel {
         return description;
     }
 
+    public ArrayList<String> getImages(){
+        return images;
+    }
+
     /**
      * Mediator function that returns all of the feed links to selected feeds.
      * @return String[]
@@ -217,6 +227,7 @@ public class DataModel {
         headlines = mParseRss.getmHeadlines();
         links = mParseRss.getmLinks();
         description = mParseRss.getmDescription();
+        images = mParseRss.getmImage();
     }
 
     /**
@@ -234,26 +245,55 @@ public class DataModel {
          * and image thumbnail. The thumbnail should be roughly 100dp by 100dp.
          * The original colors of the textviews were changed to blue for headlines and grey for
          * article descriptions.
+         *
+         *
+         *
+         * Split the articles into pages using the SQL Statement TODO SPLIT INTO PAGES
          */
         mArrayAdapter = new ArrayAdapter<String>(context, R.layout.article, headlines) {
 
             @Override
-            public View getView(int position, View convertView,
+            public View getView(final int position, View convertView,
                                 ViewGroup parent) {
                 if(convertView == null)
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.article, parent, false);
+                Handler handler = new Handler();
+                final ImageView imageView = (ImageView) convertView.findViewById(R.id.article_imgview);
 
-                ImageView imageView = (ImageView) convertView.findViewById(R.id.article_imgview);
+
                 //TODO Aysnyc tasks to download one image for this View.
                 TextView textView1 = (TextView) convertView.findViewById(R.id.headline);
                 TextView textView2 = (TextView) convertView.findViewById(R.id.description);
+                final TextView textView3 = (TextView) convertView.findViewById(R.id.image_url);
                 /*YOUR CHOICE OF COLOR*/
                 textView1.setTextColor(Color.BLUE);
                 textView1.setText(mData.getHeadlines().get(position));
                 textView2.setTextColor(Color.GRAY);
                 textView2.setText(Html.fromHtml(mData.getDescriptions().get(position).replaceAll("(<(/)img>)|(<img.+?>)", "")).toString().trim());
+                textView3.setTextColor(Color.GRAY);
+                try {
+                    String image = mData.getImages().get(position + 1);
+                    if (image == null)
+                        image = "www.example.com";
 
-                return convertView;
+                    final String imageUrl = image;
+                    textView3.setText(imageUrl);
+                }catch (IndexOutOfBoundsException e){
+                    Log.d("Bounds", mData.getHeadlines().size() + " " + mData.getImages().size());
+                }
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        DownloadArticleImage dl = new DownloadArticleImage(imageView);
+                        String url = textView3.getText().toString();
+                        if(!url.equals("www.example.com"))
+                            dl.execute(url);
+                        else
+                            imageView.setImageResource(R.drawable.rss);
+                    }
+                }, 100);
+
+                 return convertView;
             }
         };
         return mArrayAdapter;
@@ -276,11 +316,13 @@ public class DataModel {
         private ArrayList<String> mHeadlines;
         private ArrayList<String> mLinks;
         private ArrayList<String> mDescription;
+        private ArrayList<String> mImage;
 
         public ParseRSS() {
             mHeadlines = (ArrayList) new ArrayList<String>();
             mLinks = (ArrayList) new ArrayList<String>();
             mDescription = (ArrayList) new ArrayList<String>();
+            mImage = new ArrayList<String>();
         }
 
         public ArrayList<String> getmHeadlines() {
@@ -292,6 +334,9 @@ public class DataModel {
         }
         public ArrayList<String> getmDescription() {
             return mDescription;
+        }
+        public ArrayList<String> getmImage() {
+            return mImage;
         }
 
         @Override
@@ -348,22 +393,57 @@ public class DataModel {
                     // Returns the type of current event: START_TAG, END_TAG, etc..
                     int eventType = xpp.getEventType();
                     while (eventType != XmlPullParser.END_DOCUMENT) {
-                        if (eventType == XmlPullParser.START_TAG) {
+                        String headline = null;
+                        String description = null;
+                        String link = null;
+                        String image = null;
 
+                        if (eventType == XmlPullParser.START_TAG) {
+                            String name = xpp.getName();
                             if (xpp.getName().equalsIgnoreCase("item")) {
                                 insideItem = true;
                             } else if (xpp.getName().equalsIgnoreCase("title")) {
-                                if (insideItem)
-                                    mHeadlines.add(xpp.nextText()); //extract the headline
+                                if (insideItem) {
+                                    headline = xpp.nextText();
+                                    mHeadlines.add(headline); //extract the headline
+                                }
                             } else if (xpp.getName().equalsIgnoreCase("link")) {
-                                if (insideItem)
-                                    mLinks.add(xpp.nextText()); //extract the link of article
+                                if (insideItem) {
+                                    link = xpp.nextText();
+                                    mLinks.add(link); //extract the link of article
+                                }
                             } else if (xpp.getName().equalsIgnoreCase("description")) {
-                                if (insideItem)
-                                    mDescription.add(xpp.nextText()); //extract the category
+                                if (insideItem) {
+                                    description = xpp.nextText();
+                                    mDescription.add(description); //extract the category
+                                }
+                                // Inspiration from this and studying the xml data allowed for parsing https://xjaphx.wordpress.com/2011/10/16/android-xml-adventure-parsing-xml-data-with-xmlpullparser/
+                            } else if(xpp.getName().contains("media:content")) {
+                                String imageUrl = xpp.getAttributeValue(null, "url");
+                                if(imageUrl != null)
+                                    Log.d("Feed", imageUrl);
+                                image = imageUrl;
+                                mImage.add(image);
+                            } else if(xpp.getName().equalsIgnoreCase("image")){
+                                String imageUrl = xpp.nextText();
+                                image = imageUrl;
+                                mImage.add(image);
                             }
+
+                            /* Date
+                              else if (xpp.getName().equalsIgnoreCase("pubDate")) {
+                                if (insideItem) {
+                                    Log.d("Date", feed[i] + ": " + xpp.nextText().substring(0, 17));
+
+                                }
+                            }
+                            */
                         } else if (eventType == XmlPullParser.END_TAG && xpp.getName().equalsIgnoreCase("item")) {
                             insideItem = false;
+                        }
+                        if(mHeadlines.size() > mImage.size()){
+                            mImage.add(image);
+                            Log.d("Bounds", i + " added for bounds");
                         }
 
                         eventType = xpp.next(); //move to next element
@@ -380,6 +460,7 @@ public class DataModel {
                     e.printStackTrace();
                     retVal = false;
                 }
+
             }
             return retVal;
         }
