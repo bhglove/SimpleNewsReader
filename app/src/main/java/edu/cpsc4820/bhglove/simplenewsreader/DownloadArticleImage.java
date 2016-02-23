@@ -1,5 +1,6 @@
 package edu.cpsc4820.bhglove.simplenewsreader;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -18,20 +19,30 @@ import java.net.URLConnection;
  */
 public class DownloadArticleImage extends AsyncTask<String, Void, Bitmap> {
     private final WeakReference<ImageView> imageView;
+    private Context context = null;
+    private DataModel dataModel = null;
+
+
 
     public DownloadArticleImage(ImageView imageView){
         this.imageView = new WeakReference<ImageView>(imageView);
     }
 
+    public void setContext(Context context){
+        this.context = context;
+    }
     @Override
     protected void onPreExecute(){
+        if(context == null){
+            cancel(true);
+        }
 
+        dataModel = DataModel.getInstance(context);
     }
 
     @Override
     protected void onPostExecute(Bitmap params){
         ImageView image = this.imageView.get();
-
         image.setImageBitmap(params);
     }
 
@@ -46,6 +57,7 @@ public class DownloadArticleImage extends AsyncTask<String, Void, Bitmap> {
             conn.connect();
             inputStream = conn.getInputStream();
             bufferedInputStream = new BufferedInputStream(inputStream);
+
             result = BitmapFactory.decodeStream(bufferedInputStream);
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -67,6 +79,7 @@ public class DownloadArticleImage extends AsyncTask<String, Void, Bitmap> {
                 }
             }
         }
+        dataModel.addBitmapToMemoryCache(String.valueOf(params[0]), result);
         return result;
     }
 }

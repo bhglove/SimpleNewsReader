@@ -1,10 +1,7 @@
 package edu.cpsc4820.bhglove.simplenewsreader;
 
 import android.app.AlertDialog;
-import android.app.DialogFragment;
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -77,7 +74,7 @@ public class NewsFeed extends AppCompatActivity {
             }
         };
         //Allows the progress bar to be shown
-        handler.postDelayed(run, 1000);
+        handler.postDelayed(run, 1000 * mData.getSelected().size() * 2);
     }
 
     // Overrides the back button to set NewsFeed as the new Main Screen
@@ -98,6 +95,7 @@ public class NewsFeed extends AppCompatActivity {
         ArrayAdapter<String> adapter = mData.createNewsFeedAdapter(getApplicationContext());
         mListView.setAdapter(adapter);
         TextView empty = (TextView) findViewById(R.id.emptyNewsFeed);
+
 
         //Display a list of articles or a message identifying that there are no articles to show.
         if(adapter.isEmpty()){
