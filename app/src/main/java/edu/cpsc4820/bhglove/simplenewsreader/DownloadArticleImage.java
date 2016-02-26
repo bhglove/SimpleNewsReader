@@ -56,7 +56,7 @@ public class DownloadArticleImage extends AsyncTask<String, Void, Bitmap> {
             URLConnection conn = new URL(params[0]).openConnection();
             conn.connect();
             inputStream = conn.getInputStream();
-            bufferedInputStream = new BufferedInputStream(inputStream);
+            bufferedInputStream = new BufferedInputStream(inputStream, 1024);
 
             result = BitmapFactory.decodeStream(bufferedInputStream);
         } catch (MalformedURLException e) {
