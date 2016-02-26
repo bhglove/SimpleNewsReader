@@ -1,6 +1,5 @@
 package edu.cpsc4820.bhglove.simplenewsreader;
 
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -39,7 +38,7 @@ public class Feeds {
 
     public Feeds() {
          for(PopularFeeds cat : PopularFeeds.values()){
-             addFeed(cat.toReadableString(), cat.toFeed());
+             addFeed(cat.toString(), cat.toFeed());
          }
     }
 
