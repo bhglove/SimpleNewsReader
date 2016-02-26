@@ -208,7 +208,7 @@ public class DataModel {
      * @return ArrayList
      */
     public ArrayList<String> getHeadlines() {
-
+        headlines = db.getHeadlines();
         return headlines;
     }
 
@@ -217,6 +217,7 @@ public class DataModel {
      * @return ArrayList
      */
     public ArrayList<String> getLinks() {
+        links = db.getLinks();
         return links;
     }
 
@@ -225,10 +226,12 @@ public class DataModel {
      * @return ArryList
      */
     public ArrayList<String> getDescriptions() {
+        description = db.getDescriptions();
         return description;
     }
 
     public ArrayList<String> getImages(){
+        images = db.getImages();
         return images;
     }
 
@@ -241,7 +244,7 @@ public class DataModel {
     }
 
 
-    private void getData(String [] feedLink) {
+    private void getData(String feedLink) {
         //Todo make a new function called getDownloadQueue: Download needed feeds from database
 
 
@@ -264,7 +267,7 @@ public class DataModel {
         images = mParseRss.getmImage();
 
         for(int i = 0; i < headlines.size(); i++){
-            db.createNewContent(headlines.get(i), description.get(i), links.get(i), images.get(i));
+            db.createNewContent(feedLink, headlines.get(i), description.get(i), links.get(i), images.get(i));
         }
 
     }
@@ -281,15 +284,15 @@ public class DataModel {
      */
     public ArrayAdapter createNewsFeedAdapter(final Context context) {
         ArrayAdapter mArrayAdapter;
-
-        String[] download = mData.getAllSelected();
-
-        getData(download);
-
+        db.refreshContent();
+        //String[] download = mData.getAllSelected();
+        for(String feed : mData.getAllSelected()) {
+            getData(feed);
+        }
         /**
          * Split the articles into pages using the SQL Statement TODO SPLIT INTO PAGES
          */
-        mArrayAdapter = new ArrayAdapter<String>(context, R.layout.article, headlines) {
+        mArrayAdapter = new ArrayAdapter<String>(context, R.layout.article, mData.getHeadlines()) {
 
             @Override
             public View getView(final int position, View convertView,
@@ -315,11 +318,12 @@ public class DataModel {
                     }
                     final String imageUrl = image;
 
-                    if(!imageUrl.equals("www.exmaple.com")) {
-                        loadBitmap(imageUrl, imageView);
+                    if(image.contains("www.example.com")) {
+                        imageView.setImageResource(R.drawable.rss);
+                        Log.d("Image", "Set stock image ");
                     }
                     else{
-                        imageView.setImageResource(R.drawable.rss);
+                        loadBitmap(imageUrl, imageView);
                     }
                 }catch (IndexOutOfBoundsException e){
                     Log.d("Bounds", mData.getHeadlines().size() + " " + mData.getImages().size());
@@ -435,7 +439,7 @@ public class DataModel {
                                 if(imageUrl != null)
                                     Log.d("Feed", imageUrl);
                                 Log.d("Feed", "Image #" + mImage.size() + " " + imageUrl);
-                                if(imageUrl.contains(".jp") || imageUrl.contains(".png")) {
+                                if(imageUrl.contains(".jp") || imageUrl.contains(".png") || imageUrl.contains("image")) {
                                     mImage.add(imageUrl);
                                 }
                             }else if(xpp.getName().contains("media:thumbnail") && (mImage.size() < mHeadlines.size())) {
@@ -444,12 +448,12 @@ public class DataModel {
                                     Log.d("Feed", imageUrl);
                                 Log.d("Feed", "Image #" + " " + imageUrl + mImage.size());
 
-                                if(imageUrl.contains(".jp") || imageUrl.contains(".png")) {
+                                if(imageUrl.contains(".jp") || imageUrl.contains(".png") || imageUrl.contains("image")) {
                                     mImage.add(imageUrl);
                                 }
                             } else if(xpp.getName().equalsIgnoreCase("thumbnail") && (mImage.size() < mHeadlines.size())){
                                 String imageUrl = xpp.nextText();
-                                if(imageUrl.contains(".jp") || imageUrl.contains(".png")) {
+                                if(imageUrl.contains(".jp") || imageUrl.contains(".png") || imageUrl.contains("image")) {
                                     mImage.add(imageUrl);
                                 }
                                 Log.d("Feed", "Image #" + " " + imageUrl + mImage.size());

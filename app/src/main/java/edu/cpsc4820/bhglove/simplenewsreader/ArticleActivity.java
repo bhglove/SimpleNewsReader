@@ -11,7 +11,7 @@ import android.widget.ProgressBar;
 /**
  *Benjamin Glover 2/07/2016
  *
- * This activity class displays a web page retrieved from the NewsFeed class as a large WebView.
+ * This activity class displays ArticleImage web page retrieved from the NewsFeed class as ArticleImage large WebView.
  * Resources:
  *
  * Web View

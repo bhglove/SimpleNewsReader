@@ -64,19 +64,19 @@ public class DatabaseModel extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        String CREATE_TABLE_RSS = "CREATE TABLE " + TABLE_RSS + "(" + KEY_RSS_ID +
-                " INTEGER PRIMARY KEY AUTOINCREMENT , " + KEY_RSS_TITLE + " TEXT, "
+        String CREATE_TABLE_RSS = "CREATE TABLE IF NOT EXISTS " + TABLE_RSS + "(" + KEY_RSS_ID +
+                " INTEGER PRIMARY KEY AUTOINCREMENT DEFAULT 0, " + KEY_RSS_TITLE + " TEXT, "
                 + KEY_RSS_LINK + " TEXT, " + KEY_RSS_AVAILABLE + " INTEGER DEFAULT 1)";
         db.execSQL(CREATE_TABLE_RSS);
 
-        String CREATE_TABLE_CONTENT = "CREATE TABLE " + TABLE_CONTENT + "(" + KEY_CONTENT_ID +
-                 " INTEGER PRIMARY KEY AUTOINCREMENT , " + KEY_CONTENT_HEADLINE + " TEXT, " +
+        String CREATE_TABLE_CONTENT = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTENT + "(" + KEY_CONTENT_ID +
+                 " INTEGER PRIMARY KEY AUTOINCREMENT DEFAULT 0, " + KEY_CONTENT_HEADLINE + " TEXT, " +
                 KEY_CONTENT_DESCRIPTION + " TEXT, " + KEY_CONTENT_PERMALINK + " TEXT, " +
                 KEY_CONTENT_IMG_LINK + " TEXT)";
         db.execSQL(CREATE_TABLE_CONTENT);
 
-        String CREATE_TABLE_RSS_CONTENT = "CREATE TABLE " + TABLE_RSS_CONTENT + "("
-                + KEY_RSS_CONTENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " + KEY_RSS_ID +
+        String CREATE_TABLE_RSS_CONTENT = "CREATE TABLE IF NOT EXISTS " + TABLE_RSS_CONTENT + "("
+                + KEY_RSS_CONTENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT DEFAULT 0, " + KEY_RSS_ID +
                 " INTEGER, " + KEY_CONTENT_ID + " INTEGER )";
         db.execSQL(CREATE_TABLE_RSS_CONTENT);
     }
@@ -86,33 +86,123 @@ public class DatabaseModel extends SQLiteOpenHelper{
 
     }
 
+    private int checkRSSDuplicates(String title, String link){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String SELECT = "SELECT " + KEY_RSS_ID + " FROM " + TABLE_RSS + " WHERE "
+                + KEY_RSS_TITLE + "='" + title + "' OR " + KEY_RSS_LINK + "='" + link + "'";
+
+        Cursor cursor;
+        cursor = db.rawQuery(SELECT, null);
+        int count =  cursor.getCount();
+        cursor.close();
+        db.close();
+        return count;
+    }
+
+    public int getRssId(String link){
+        int retVal;
+        SQLiteDatabase db = this.getWritableDatabase();
+        String SELECT =  "SELECT " + KEY_RSS_ID + " FROM " + TABLE_RSS + " WHERE "
+                + KEY_RSS_LINK + "='" + link + "'";
+
+        Cursor cursor = db.rawQuery(SELECT, null);
+        cursor.moveToFirst();
+        if(cursor.getCount() == 1)
+            retVal = cursor.getInt(0);
+        else
+            retVal = -1;
+        cursor.close();
+        db.close();
+        return retVal;
+    }
+
+    public void refreshContent(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String DELETE = "DROP TABLE IF EXISTS " + TABLE_RSS_CONTENT;
+        String DELETE2 = "DROP TABLE IF EXISTS " + TABLE_CONTENT;
+        db.execSQL(DELETE);
+        db.execSQL(DELETE2);
+
+        String CREATE_TABLE_CONTENT = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTENT + "(" + KEY_CONTENT_ID +
+                " INTEGER PRIMARY KEY AUTOINCREMENT DEFAULT 0, " + KEY_CONTENT_HEADLINE + " TEXT, " +
+                KEY_CONTENT_DESCRIPTION + " TEXT, " + KEY_CONTENT_PERMALINK + " TEXT, " +
+                KEY_CONTENT_IMG_LINK + " TEXT)";
+        db.execSQL(CREATE_TABLE_CONTENT);
+
+        String CREATE_TABLE_RSS_CONTENT = "CREATE TABLE IF NOT EXISTS " + TABLE_RSS_CONTENT + "("
+                + KEY_RSS_CONTENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT DEFAULT 0, " + KEY_RSS_ID +
+                " INTEGER, " + KEY_CONTENT_ID + " INTEGER )";
+        db.execSQL(CREATE_TABLE_RSS_CONTENT);
+
+        db.close();
+    }
 
     public void createNewFeed(String title, String link){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_RSS_TITLE, title);
-        Log.d("Create", KEY_RSS_TITLE + " = " + title);
-        values.put(KEY_RSS_LINK, link);
-        Log.d("Create", KEY_RSS_LINK + " = " + link);
-        values.put(KEY_RSS_AVAILABLE, 1);
-        Log.d("Create", KEY_RSS_AVAILABLE + "='1'");
-        db.insert(TABLE_RSS, null, values);
+        if(checkRSSDuplicates(title, link) == 0) {
+            long value;
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(KEY_RSS_TITLE, title);
+            Log.d("Create", KEY_RSS_TITLE + " = " + title);
+            values.put(KEY_RSS_LINK, link);
+            Log.d("Create", KEY_RSS_LINK + " = " + link);
+            values.put(KEY_RSS_AVAILABLE, 1);
+            Log.d("Create", KEY_RSS_AVAILABLE + "='1'");
 
-        db.close();
+            Log.d("Duplicates", title + " " + checkRSSDuplicates(title, link));
+            value = db.insertWithOnConflict(TABLE_RSS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            db.close();
+            Log.d("Values", title + " " + value);
+        }
+
+        Log.d("Value", title + " is id: " + getRssId(title));
     }
 
-    public void createNewContent(String title, String description, String link, String imageUrl){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_CONTENT_HEADLINE, title);
-        values.put(KEY_CONTENT_DESCRIPTION, description);
-        values.put(KEY_CONTENT_PERMALINK, link);
-        values.put(KEY_CONTENT_IMG_LINK, imageUrl);
-        db.insert(TABLE_CONTENT, null, values);
+    private int checkContentDuplicate(String title, String link){
+        SQLiteDatabase db = getReadableDatabase();
+        String SELECT = "SELECT * FROM " + TABLE_CONTENT + " WHERE " + KEY_CONTENT_HEADLINE + "=\""
+                + title + "\" OR "
+                + KEY_CONTENT_PERMALINK + "=\"" + link + "\"";
+        Cursor cursor = db.rawQuery(SELECT, null);
+        int count = cursor.getCount();
+        cursor.close();
         db.close();
+        return count;
     }
 
-    public void updateDatabase(int rssId, int contentId){
+    public int getContentId(String title, String link){
+        int retVal;
+        SQLiteDatabase db = this.getWritableDatabase();
+        String SELECT =  "SELECT " + KEY_RSS_ID + " FROM " + TABLE_CONTENT + " WHERE "
+                + KEY_CONTENT_HEADLINE + "=\"" + title + "\" AND " + KEY_CONTENT_PERMALINK + "=\""
+        + link + "\"";
+
+        Cursor cursor = db.rawQuery(SELECT, null);
+        cursor.moveToFirst();
+        if(cursor.getCount() == 1)
+            retVal = cursor.getInt(0);
+        else
+            retVal = -1;
+        cursor.close();
+        return retVal;
+    }
+
+    public void createNewContent(String feedLink, String title, String description, String link, String imageUrl){
+        if(checkContentDuplicate(title,  link) == 0) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(KEY_CONTENT_HEADLINE, title);
+            values.put(KEY_CONTENT_DESCRIPTION, description);
+            values.put(KEY_CONTENT_PERMALINK, link);
+            values.put(KEY_CONTENT_IMG_LINK, imageUrl);
+            int id = (int) db.insert(TABLE_CONTENT, null, values);
+            db.close();
+
+            createNewRssContent(getRssId(feedLink), id);
+        }
+    }
+
+    public void createNewRssContent(int rssId, int contentId){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_RSS_ID, rssId);
@@ -206,17 +296,16 @@ public class DatabaseModel extends SQLiteOpenHelper{
 
 
     public ArrayList getHeadlines() {
-        int index = 0;
         ArrayList<String> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        String WHERE  = "SELECT " + KEY_CONTENT_HEADLINE + " FROM " + TABLE_CONTENT;
+        String WHERE  = "SELECT " + KEY_CONTENT_HEADLINE + " FROM " + TABLE_CONTENT +
+                " Limit 0, 15";
         Cursor cursor = db.rawQuery(WHERE, null);
 
 
         if(cursor.moveToFirst()){
             do{
-                list.add(cursor.getString(index));
-                index++;
+                list.add(cursor.getString(0));
             }while (cursor.moveToNext());
         }
         cursor.close();
@@ -225,17 +314,16 @@ public class DatabaseModel extends SQLiteOpenHelper{
     }
 
     public ArrayList getLinks() {
-        int index = 0;
         ArrayList<String> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        String WHERE  = "SELECT " + KEY_CONTENT_PERMALINK + " FROM " + TABLE_CONTENT;
+        String WHERE  = "SELECT " + KEY_CONTENT_PERMALINK + " FROM " + TABLE_CONTENT+
+                " Limit 0, 15";
         Cursor cursor = db.rawQuery(WHERE, null);
 
 
         if(cursor.moveToFirst()){
             do{
-                list.add(cursor.getString(index));
-                index++;
+                list.add(cursor.getString(0));
             }while (cursor.moveToNext());
         }
 
@@ -245,17 +333,36 @@ public class DatabaseModel extends SQLiteOpenHelper{
     }
 
 
-    public ArrayList getDescriptions() { int index = 0;
+    public ArrayList getDescriptions() {
         ArrayList<String> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        String WHERE  = "SELECT " + KEY_CONTENT_DESCRIPTION + " FROM " + TABLE_CONTENT;
+        String WHERE  = "SELECT " + KEY_CONTENT_DESCRIPTION + " FROM " + TABLE_CONTENT +
+                " Limit 0, 15";
         Cursor cursor = db.rawQuery(WHERE, null);
 
 
         if(cursor.moveToFirst()){
             do{
-                list.add(cursor.getString(index));
-                index++;
+                list.add(cursor.getString(0));
+            }while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return list;
+    }
+
+    public ArrayList getImages() {
+        ArrayList<String> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String WHERE  = "SELECT " + KEY_CONTENT_IMG_LINK + " FROM " + TABLE_CONTENT +
+                " Limit 0, 15";;
+        Cursor cursor = db.rawQuery(WHERE, null);
+
+
+        if(cursor.moveToFirst()){
+            do{
+                list.add(cursor.getString(0));
             }while (cursor.moveToNext());
         }
 
