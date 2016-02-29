@@ -22,7 +22,8 @@
         </activity>
         <activity android:name=".NewsFeed" />
         <activity android:name=".Subscription" />
-        <activity android:name=".ArticleActivity" />
+        <activity android:name=".ArticleActivity"></activity>
+        <activity android:name=".InfoActivity"></activity>
     </application>
 
 </manifest>

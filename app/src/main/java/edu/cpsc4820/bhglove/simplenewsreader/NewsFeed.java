@@ -1,8 +1,6 @@
 package edu.cpsc4820.bhglove.simplenewsreader;
 
-import android.app.AlertDialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -17,23 +15,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 /**
+ * The main activity that displays the a list of articles along with descriptive attributes.
  * Displays the description and title of all articles in a ListView
- *
+ * Created by Benjamin Glover 2/27/2016
  */
 public class NewsFeed extends AppCompatActivity {
     private ListView mListView;
     private DataModel mData = null;
     private ProgressBar progressBar;
-    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_feed);
         progressBar = (ProgressBar) findViewById(R.id.progressBar2);
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setMax(100);
 
-        if(mData == null)
-          mData = DataModel.getInstance(getApplicationContext());
+        if (mData == null)
+            mData = DataModel.getInstance(getApplicationContext());
 
         Button categoryButton = (Button) findViewById(R.id.buttonAddCat);
         categoryButton.setOnClickListener(new View.OnClickListener() {
@@ -43,10 +43,12 @@ public class NewsFeed extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
         ImageButton infoButton = (ImageButton) findViewById(R.id.infoButton);
         infoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*
                 AlertDialog.Builder infoBuilder = new AlertDialog.Builder(NewsFeed.this);
                 infoBuilder.setTitle("About Simple News Reader");
 
@@ -60,21 +62,39 @@ public class NewsFeed extends AppCompatActivity {
                 }
 
                 infoBuilder.create().show();
+                */
+                Intent intent = new Intent(NewsFeed.this, InfoActivity.class);
+                startActivity(intent);
             }
         });
 
-        progressBar.setVisibility(View.VISIBLE);
-        //Handler to offset the download of RSS Content to another thread.
-        handler = new Handler();
 
-        Runnable run = new Runnable() {
+
+        //Handler to offset the download of RSS Content to another thread.
+        final Handler handler = new Handler();
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                createListView();
+                final TextView downloading = (TextView) findViewById(R.id.downloadingText);
+                downloading.setVisibility(View.VISIBLE);
+                try {
+                    mData.refreshDataContent();
+                    while (mData.getProgress() < 98) {
+                        Thread.sleep(500);
+                    }
+                }catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        downloading.setVisibility(View.INVISIBLE);
+                        createListView();
+                    }
+                });
             }
-        };
-        //Allows the progress bar to be shown
-        handler.postDelayed(run, 1000 * mData.getSelected().size() * 2);
+        });
+        thread.start();
     }
 
     // Overrides the back button to set NewsFeed as the new Main Screen
@@ -107,6 +127,7 @@ public class NewsFeed extends AppCompatActivity {
             mListView.setVisibility(View.VISIBLE);
             empty.setVisibility(View.INVISIBLE);
         }
+
         progressBar.setVisibility(View.GONE);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

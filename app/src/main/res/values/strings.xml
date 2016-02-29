@@ -3,8 +3,8 @@
     <string name="action_settings">Settings</string>
     <string name="button_news_feed">News Feed</string>
     <string name="button_news_cat">Categories</string>
-    <string name="selected">Selected Categories</string>
-    <string name="button_add_cat">Add Category</string>
+    <string name="selected">Subscriptions</string>
+    <string name="button_add_cat">Add News Source</string>
     <string name="text_empty_newsfeed">Your news feed is empty.\n\nTo add articles,
         add a category using the Add Category Button</string>
     <string name="about">About</string>
@@ -13,29 +13,26 @@
     <string name="about_label_2">Acknowledgements</string>
     <string name="about_label_3">New Technologies</string>
     <string name="about_text">This android application parses RSS feeds and displays the contents
-    into an easy to read and unified place.\n\nCreated by: Benjamin Glover (2/07/2016)
+    into an easy to read and unified place.\n\nCreated by: Benjamin Glover (2/27/2016)
     </string>
     <string name="about_text_1">Add a new source of information from either a
         provided sample of RSS feeds or enter your own by pressing the "Add Category" button.\n
         After a new source is entered into the list, press the back button to return to the News Feed.\n
         There, the articles will populate and able to be clicked and view.\n\nEnjoy your readings!</string>
     <string name="about_text_2">
-        Web View\n
-        http://developer.android.com/intl/zh-tw/reference/android/webkit/WebView.html\n\n
-        Remove the image tag from html strings\n
-        http://stackoverflow.com/questions/11178533/how-to-skip-image-tag-in-html-data-in-android?answertab=active#tab-top\n\n
-        Clemson RSS Feeds\n
-        http://newsstand.clemson.edu/mediarelations/clemson-scientists-research-on-tropical-forests-featured-in-nature/\n\n
-        Using Async task to fetch data in the background\n
-        http://stackoverflow.com/questions/20017448/android-app-force-close-when-sending-data-to-local-webserver-from-android\n\n
-        Pulling and parsing RSS Feed data into Lists\n
-        http://jmsliu.com/1508/rss-reader-android-app-tutorial-3-parse-xml-in-android.html\n\n
-        Better input stream for url connections\n
-        http://stackoverflow.com/questions/20017448/android-app-force-close-when-sending-data-to-local-webserver-from-android\n\n
+        Progress Bar and Threads \n
+        http://huuah.com/android-progress-bar-and-thread-updating/ \n\n
+        Inner Join \n
+        http://stackoverflow.com/questions/10195451/sql-inner-join-with-3-table \n\n
+        Caching Images\n
+        http://developer.android.com/intl/zh-tw/training/displaying-bitmaps/cache-bitmap.html
     </string>
-    <string name="about_text_3">RSS Parsing\nAsync Tasks\nWeb View</string>
+    <string name="about_text_3">Image Caching\nThreads and Handler\nInner Join</string>
     <string name="title_activity_loading">LoadingActivity</string>
     <string name="article_img">Article Picture</string>
+    <string name="download_text">Your articles are currently downloading.</string>
+    <string name="manage_subscriptions">Manage Subscriptions</string>
+    <string name="info_button_context">Info Button</string>
 
 
 </resources>

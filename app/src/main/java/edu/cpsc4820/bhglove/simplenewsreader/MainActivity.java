@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //TODO Check for Internet permissions for 6.0
         permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET);
         if(permissionCheck != PackageManager.PERMISSION_GRANTED){
             if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.INTERNET)){

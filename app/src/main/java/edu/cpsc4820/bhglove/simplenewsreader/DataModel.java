@@ -42,10 +42,7 @@ import java.util.concurrent.ExecutionException;
  *
  * Remove the image tag from html strings
  * http://stackoverflow.com/questions/11178533/how-to-skip-image-tag-in-html-data-in-android?answertab=active#tab-top
- *
- *
- *
- */
+ * */
 public class DataModel {
 
     private static DataModel mData = null;
@@ -53,6 +50,8 @@ public class DataModel {
     private ArrayList<String> links;     //The weblink of the article
     private ArrayList<String> description; //A description of the article (Contains HTML data)
     private ArrayList<String> images;
+    private ArrayList<String> dates;
+
     private ArrayList mListSelected;   //This is the selected feeds the user wants to display on the news feed
     private ArrayList mListAvailable;
     private Feeds feedList;
@@ -60,16 +59,20 @@ public class DataModel {
     private Context context;
     private LruCache<String, Bitmap> mMemoryCache;
 
+    private int progress;
+
     /** Initialize variables and set the three preset RSS feeds. */
    private DataModel(Context context){
        headlines = new ArrayList<String>();
        links = new ArrayList<String>();
        description = new ArrayList<String>();
        images = new ArrayList<String>();
+       dates = new ArrayList<String>();
+
        mListAvailable = new ArrayList<String>();
        mListSelected = new ArrayList<String>();
        this.context = context;
-
+       progress = 0;
        if(db == null){
            db = new DatabaseModel(context);
        }
@@ -98,16 +101,32 @@ public class DataModel {
         return mData;
     }
 
+    /**
+     * Returns the bitmap associated to that key.
+     * @param key
+     * @return
+     */
     public Bitmap getBitmapFromCache(String key){
         return mMemoryCache.get(key);
     }
 
+    /**
+     * Adds a Bitmap based on a key and also checks for duplicates.
+     * @param key
+     * @param bitmap
+     */
     public void addBitmapToMemoryCache(String key, Bitmap bitmap){
         if(getBitmapFromCache(key) == null && bitmap != null){
             mMemoryCache.put(key, bitmap);
         }
     }
 
+    /**
+     * Public method to set a bitmap to an imageview. This is the method that updates in the
+     * listview.
+     * @param url
+     * @param imageView
+     */
     public void loadBitmap(String url, ImageView imageView){
         final String imageUrl = url;
         final ImageView image = imageView;
@@ -126,8 +145,6 @@ public class DataModel {
             }
         }
     }
-
-
 
     /**
      *  Mediator function that adds a new RSS Feed from class Subscription to the list in class Feeds
@@ -230,9 +247,37 @@ public class DataModel {
         return description;
     }
 
+    /**
+     * Returns the image urls from the database.
+     * @return ArrayList Images stored in database.
+     */
     public ArrayList<String> getImages(){
         images = db.getImages();
         return images;
+    }
+
+    /**
+     * Mediator function that returns the title of an article from the database.
+     * @param link Permalink of the article
+     * @return String Content Title
+     */
+    public String getContentTitle(String link){
+
+        return db.getContentRssTitle(db.getContentId(link));
+
+    }
+
+    /**
+     * Returns the Date associated with a particular article.
+     * @param link
+     * @return
+     */
+    public String getContentDate(String link){
+        return db.getContentDate(db.getContentId(link));
+    }
+
+    public ArrayList<String> getDates(){
+        return dates;
     }
 
     /**
@@ -244,11 +289,12 @@ public class DataModel {
     }
 
 
-    private void getData(String feedLink) {
-        //Todo make a new function called getDownloadQueue: Download needed feeds from database
-
-
-        //TODO Here check the database for previously downloaded links
+    /**
+     * By using the link of a particular rss feed, the method collects the information of the article:
+     * Headlines, Descriptions, Links, ImageUrl, and Date. And creates a new entry in the database.
+     * @param feedLink - RSS Link
+     */
+    private void parseDataFromXmlUrl(String feedLink) {
         ParseRSS mParseRss = new ParseRSS();
 
         try {
@@ -265,11 +311,36 @@ public class DataModel {
         description = mParseRss.getmDescription();
         links = mParseRss.getmLinks();
         images = mParseRss.getmImage();
+        dates = mParseRss.getmDate();
 
         for(int i = 0; i < headlines.size(); i++){
-            db.createNewContent(feedLink, headlines.get(i), description.get(i), links.get(i), images.get(i));
+            db.createNewContent(feedLink, headlines.get(i), description.get(i), links.get(i),
+                    images.get(i), dates.get(i));
         }
+    }
 
+    /**
+     * Returns the progress made by the thread downloading and parsing rss feeds.
+     * @return int
+     */
+    public int getProgress(){
+        return progress;
+    }
+    public void refreshDataContent(){
+        int i = 0;
+        progress = 0;
+        db.refreshContent();
+        if(mData.getAllSelected().length == 0){
+            progress = 100;
+        }
+        else {
+            for (String feed : mData.getAllSelected()) {
+                i++;
+                parseDataFromXmlUrl(feed);
+                this.progress = (100 / mData.getAllSelected().length) * i;
+                Log.d("Progress", "Progress at: " + progress);
+            }
+        }
     }
 
     /**
@@ -284,11 +355,6 @@ public class DataModel {
      */
     public ArrayAdapter createNewsFeedAdapter(final Context context) {
         ArrayAdapter mArrayAdapter;
-        db.refreshContent();
-        //String[] download = mData.getAllSelected();
-        for(String feed : mData.getAllSelected()) {
-            getData(feed);
-        }
         /**
          * Split the articles into pages using the SQL Statement TODO SPLIT INTO PAGES
          */
@@ -304,13 +370,21 @@ public class DataModel {
 
                 TextView textView1 = (TextView) convertView.findViewById(R.id.headline);
                 TextView textView2 = (TextView) convertView.findViewById(R.id.description);
+                TextView textView3 = (TextView) convertView.findViewById(R.id.pubDate);
+                TextView textView4 = (TextView) convertView.findViewById(R.id.rssTitle);
+
                 /*YOUR CHOICE OF COLOR*/
                 textView1.setTextColor(Color.BLUE);
                 textView1.setText(mData.getHeadlines().get(position));
                 textView2.setTextColor(Color.GRAY);
                 String description = Html.fromHtml(mData.getDescriptions().get(position).replaceAll("(<(/)img>)|(<img.+?>)", "")).toString().trim();
                 textView2.setText(description);
+                textView3.setText(getContentDate(mData.getLinks().get(position)));
 
+                textView3.setTextColor(Color.GRAY);
+
+                textView4.setTextColor(Color.GRAY);
+                textView4.setText(getContentTitle(mData.getLinks().get(position)));
                 try {
                     String image = mData.getImages().get(position);
                     if (image == null) {
@@ -352,12 +426,14 @@ public class DataModel {
         private ArrayList<String> mLinks;
         private ArrayList<String> mDescription;
         private ArrayList<String> mImage;
+        private ArrayList<String> mDate;
 
         public ParseRSS() {
             mHeadlines = (ArrayList) new ArrayList<String>();
             mLinks = (ArrayList) new ArrayList<String>();
             mDescription = (ArrayList) new ArrayList<String>();
             mImage = new ArrayList<String>();
+            mDate = new ArrayList<String>();
         }
 
         public ArrayList<String> getmHeadlines() {
@@ -372,6 +448,7 @@ public class DataModel {
         public ArrayList<String> getmImage() {
             return mImage;
         }
+        public ArrayList<String> getmDate() { return mDate; }
 
         @Override
         protected String doInBackground(String... params) {
@@ -457,19 +534,17 @@ public class DataModel {
                                     mImage.add(imageUrl);
                                 }
                                 Log.d("Feed", "Image #" + " " + imageUrl + mImage.size());
+                            } else if (xpp.getName().equalsIgnoreCase("pubDate")) {
+                                    mDate.add(xpp.nextText().substring(0, 17));
+                                    //Log.d("Date", feed[i] + ": " + xpp.nextText().substring(0, 17));
                             }
-                            /* Date
-                              else if (xpp.getName().equalsIgnoreCase("pubDate")) {
-                                if (insideItem) {
-                                    Log.d("Date", feed[i] + ": " + xpp.nextText().substring(0, 17));
-
-                                }
-                            }
-                            */
                         } else if (eventType == XmlPullParser.END_TAG && xpp.getName().equalsIgnoreCase("item")) {
-                            if(mHeadlines.size() != mImage.size()){
+                            if(mHeadlines.size() > mImage.size()){
                                 Log.d("Feed", "headlines: " + mHeadlines.size() + " vs images: " +  mImage.size());
                                 mImage.add(null);
+                            }
+                            if(mHeadlines.size() > mDate.size()){
+                                mDate.add(" ");
                             }
                             insideItem = false;
                         }

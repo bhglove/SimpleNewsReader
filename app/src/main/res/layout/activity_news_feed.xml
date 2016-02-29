@@ -9,53 +9,73 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="edu.cpsc4820.bhglove.simplenewsreader.NewsFeed">
 
-    <ListView
-        android:id="@+id/newsFeedView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/buttonAddCat"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/textView2"
-        android:visibility="invisible" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/button_news_feed"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/button_news_feed"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Button
-        android:id="@+id/buttonAddCat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/button_add_cat" />
+        <ListView
+            android:id="@+id/newsFeedView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/textView2"
+            android:layout_above="@+id/buttonAddCat" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/emptyNewsFeed"
-        android:layout_below="@+id/textView2"
-        android:layout_marginTop="177dp"
-        android:text="@string/text_empty_newsfeed"
-        android:layout_above="@+id/buttonAddCat"
-        android:textStyle="bold"
-        android:textAlignment="center"
-        android:visibility="invisible" />
+        <Button
+            android:id="@+id/buttonAddCat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/manage_subscriptions" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/infoButton"
-        android:src="@android:drawable/ic_menu_info_details"
-        android:layout_alignBottom="@+id/buttonAddCat"
-        android:layout_alignRight="@+id/newsFeedView"
-        android:layout_alignEnd="@+id/newsFeedView" />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/infoButton"
+            android:src="@android:drawable/ic_menu_info_details"
+            android:layout_alignBottom="@+id/buttonAddCat"
+            android:layout_alignRight="@+id/newsFeedView"
+            android:layout_alignEnd="@+id/newsFeedView"
+            android:contentDescription="@string/info_button_context" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/emptyNewsFeed"
+            android:text="@string/text_empty_newsfeed"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:visibility="invisible"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/download_text"
+            android:id="@+id/downloadingText"
+            android:layout_marginTop="72dp"
+            android:layout_below="@+id/textView2"
+            android:layout_centerHorizontal="true"
+            android:visibility="invisible" />
+
+    </RelativeLayout>
 
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"

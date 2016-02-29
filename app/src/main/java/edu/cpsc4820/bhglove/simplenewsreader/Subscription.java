@@ -13,12 +13,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /***
  * 2/17/2016 SelectCategory renamed to Subscription
@@ -157,7 +155,7 @@ public class Subscription extends AppCompatActivity {
                             deleteBuilder.setTitle("Confirm Delete");
                             deleteBuilder.setMessage("Are you sure you want to delete " + item + " feed?");
 
-                            //Confirm Dialog to comfirm deletion.
+                            //Confirm Dialog to confirm deletion.
                             deleteBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                                 /** Prompt the user for deletion. **/
                                 @Override
@@ -278,8 +276,6 @@ public class Subscription extends AppCompatActivity {
                                                     mAdapter.clear();
                                                     mAdapter.addAll(data.getSelected());
                                                     mAdapter.notifyDataSetChanged();
-
-                                                    Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
                                                 }
                                             }
                                         }

@@ -36,7 +36,6 @@ public class DownloadArticleImage extends AsyncTask<String, Void, Bitmap> {
         if(context == null){
             cancel(true);
         }
-
         dataModel = DataModel.getInstance(context);
     }
 
