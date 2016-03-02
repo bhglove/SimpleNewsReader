@@ -14,7 +14,7 @@ public class Feeds {
         private String title;
         private String link;
 
-        public RssFeed() {};
+        public RssFeed() {}
 
         public String getTitle() {
             return title;
