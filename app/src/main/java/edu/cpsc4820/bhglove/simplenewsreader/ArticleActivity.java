@@ -9,18 +9,16 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 /**
- *Benjamin Glover 2/07/2016
- *
- * This activity class displays a web page retrieved from the NewsFeed class as a large WebView.
+ * This activity class displays ArticleImage web page retrieved from the NewsFeed
+ * class as ArticleImage large WebView.
+ * Created by Benjamin Glover on 2/17/2016.
  * Resources:
  *
  * Web View
  * http://developer.android.com/intl/zh-tw/reference/android/webkit/WebView.html
  */
 public class ArticleActivity extends AppCompatActivity {
-
     private WebView mWebView;
-
     private ProgressBar webBar;
 
     @Override

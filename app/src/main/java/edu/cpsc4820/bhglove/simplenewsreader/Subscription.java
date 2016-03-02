@@ -17,12 +17,13 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /***
+ * 2/17/2016 SelectCategory renamed to Subscription
+ *
  * Creates two listviews displaying the selected and available  RSS Feeds for the User.
  */
-public class SelectCategory extends AppCompatActivity {
+public class Subscription extends AppCompatActivity {
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
     private TextView mEmptyText;
@@ -30,7 +31,7 @@ public class SelectCategory extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(SelectCategory.this, NewsFeed.class);
+        Intent intent = new Intent(Subscription.this, NewsFeed.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         super.onBackPressed();
@@ -40,8 +41,9 @@ public class SelectCategory extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select);
-
-        data = DataModel.getInstance();
+        if(data == null) {
+           data = DataModel.getInstance(getApplicationContext());
+        }
 
         mListView = (ListView) findViewById(R.id.categoryListView);
         mEmptyText = (TextView) findViewById(R.id.textView);
@@ -49,7 +51,8 @@ public class SelectCategory extends AppCompatActivity {
         mEmptyText.setVisibility(View.INVISIBLE);
 
         //Set the adapter for the selected feed list (on main screen)
-        mAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, data.getmListSelected()){
+
+        mAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, data.getSelected()){
 
             @Override
             public View getView(int position, View convertView,
@@ -67,7 +70,7 @@ public class SelectCategory extends AppCompatActivity {
 
 
         //Dispay a text view alerting the user that the list is empty.
-        if(data.getmListSelected().isEmpty()){
+        if(data.getSelected().isEmpty()){
             mEmptyText.setText("List is empty");
             mEmptyText.setVisibility(View.VISIBLE);
         }
@@ -83,23 +86,23 @@ public class SelectCategory extends AppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                final AlertDialog.Builder optionsBuilder = new AlertDialog.Builder(SelectCategory.this);
-                //String title = PopularFeeds.valueOf(data.getmListSelected().get(position).toString()).toReadableString();
-                String title = data.getmListSelected().get(position).toString();
+                final AlertDialog.Builder optionsBuilder = new AlertDialog.Builder(Subscription.this);
+                //String title = PopularFeeds.valueOf(data.getSelected().get(position).toString()).toReadableString();
+                String title = data.getSelected().get(position).toString();
                 optionsBuilder.setTitle("Options for " + title);
 
                 optionsBuilder.setItems(new String[]{"Edit", "Delete"}, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        final String item = data.getmListSelected().get(position).toString();
+                        final String item = data.getSelected().get(position).toString();
 
                         //** Creates a dialog for editing the selected RSS Feed. **/
                         if (which == 0) {
-                            AlertDialog.Builder editBuilder = new AlertDialog.Builder(SelectCategory.this);
-                            TextView rssTitleLabel = new TextView(SelectCategory.this);
-                            TextView rssLinkLabel = new TextView(SelectCategory.this);
-                            final EditText rssTitle = new EditText(SelectCategory.this);
-                            final EditText rssLink = new EditText(SelectCategory.this);
+                            AlertDialog.Builder editBuilder = new AlertDialog.Builder(Subscription.this);
+                            TextView rssTitleLabel = new TextView(Subscription.this);
+                            TextView rssLinkLabel = new TextView(Subscription.this);
+                            final EditText rssTitle = new EditText(Subscription.this);
+                            final EditText rssLink = new EditText(Subscription.this);
 
                             editBuilder.setTitle("Edit");
 
@@ -108,11 +111,14 @@ public class SelectCategory extends AppCompatActivity {
                             //** Formatting for the dialog text. **/
                             String title = item;
                             String feed = data.findLink(title);
+
+
                             rssTitle.setText(title);
                             rssLink.setText(feed);
                             rssTitle.setTextColor(Color.BLACK);
                             rssLink.setTextColor(Color.BLACK);
-
+                            rssTitle.setSelection(rssTitle.getText().toString().length());
+                            rssLink.setSelection(rssLink.getText().toString().length());
                             rssTitleLabel.setText("RSS Title");
                             rssLinkLabel.setText("RSS Link");
 
@@ -132,6 +138,8 @@ public class SelectCategory extends AppCompatActivity {
                                     String link = rssLink.getText().toString();
                                     if (!title.isEmpty() && !link.isEmpty()) {
                                         data.editFeed(item, title, link);
+                                        mAdapter.clear();
+                                        mAdapter.addAll(data.getSelected());
                                         mAdapter.notifyDataSetChanged();
                                     }
                                 }
@@ -143,20 +151,25 @@ public class SelectCategory extends AppCompatActivity {
 
                         /** Creates a dialog for deleting a RSS Feed **/
                         if (which == 1) {
-                            AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(SelectCategory.this);
+                            AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(Subscription.this);
                             deleteBuilder.setTitle("Confirm Delete");
                             deleteBuilder.setMessage("Are you sure you want to delete " + item + " feed?");
 
-                            //Confirm Dialog to comfirm deletion.
+                            //Confirm Dialog to confirm deletion.
                             deleteBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                                 /** Prompt the user for deletion. **/
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Log.d("Index", "Index at: " + position);
-                                    data.addToAvailableFeed(data.getmListSelected().get(position).toString());
+
+                                    data.setAvailable(data.getSelected().get(position).toString());
+
+                                    mAdapter.clear();
+                                    mAdapter.addAll(data.getSelected());
                                     mAdapter.notifyDataSetChanged();
+
                                     dialog.dismiss();
-                                    if (data.getmListSelected().size() == 0) {
+                                    if (data.getSelected().size() == 0) {
                                         mEmptyText.setText("List is empty");
                                         mEmptyText.setVisibility(View.VISIBLE);
                                     }
@@ -179,9 +192,9 @@ public class SelectCategory extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SelectCategory.this);
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(Subscription.this);
                 dialogBuilder.setTitle("Select Category");
-                final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, data.getmListAvailable()) {
+                final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, data.getAvailable()) {
 
                     @Override
                     public View getView(int position, View convertView,
@@ -200,10 +213,17 @@ public class SelectCategory extends AppCompatActivity {
                 dialogBuilder.setSingleChoiceItems(adapter, 0, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        data.getSelected().add(data.getAvailable().get(which));
+                        data.setSelected(data.getAvailable().get(which).toString());
 
-                        data.addToSelectedFeed(data.getmListAvailable().get(which).toString());
-                        adapter.notifyDataSetChanged();
+                        mAdapter.clear();
+                        mAdapter.addAll(data.getSelected());
                         mAdapter.notifyDataSetChanged();
+
+                        adapter.clear();
+                        adapter.addAll(data.getAvailable());
+                        adapter.notifyDataSetChanged();
+
                         mListView.setVisibility(View.VISIBLE);
                         mEmptyText.setText(R.string.selected);
                         mEmptyText.setVisibility(View.VISIBLE);
@@ -213,7 +233,7 @@ public class SelectCategory extends AppCompatActivity {
                 dialogBuilder.setNeutralButton("Add Custom RSS Feed", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SelectCategory.this);
+                                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(Subscription.this);
                                 dialogBuilder.setTitle("Add Custom RSS");
 
                                 final EditText rssTitle = new EditText(getApplicationContext());
@@ -244,13 +264,18 @@ public class SelectCategory extends AppCompatActivity {
                                                 String link = rssLink.getText().toString();
                                                 if (!title.isEmpty() && !link.isEmpty()) {
                                                     data.createNewFeed(title, link);
-                                                    if (data.getmListSelected().size() == 0) {
+
+                                                    if (data.getSelected().size() == 0) {
                                                         mEmptyText.setText(R.string.selected);
                                                         mEmptyText.setVisibility(View.VISIBLE);
                                                     }
-                                                    data.getmListSelected().add(title);
+
+                                                    data.getSelected().add(title);
+                                                    data.setSelected(title);
+
+                                                    mAdapter.clear();
+                                                    mAdapter.addAll(data.getSelected());
                                                     mAdapter.notifyDataSetChanged();
-                                                    Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
                                                 }
                                             }
                                         }
