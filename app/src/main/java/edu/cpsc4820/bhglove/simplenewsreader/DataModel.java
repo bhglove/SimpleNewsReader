@@ -337,7 +337,7 @@ public class DataModel {
             for (String feed : mData.getAllSelected()) {
                 i++;
                 parseDataFromXmlUrl(feed);
-                this.progress = (100 / mData.getAllSelected().length) * i;
+                progress = (100 / mData.getAllSelected().length) * i;
                 Log.d("Progress", "Progress at: " + progress);
             }
         }

@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * The main activity that displays the a list of articles along with descriptive attributes.
@@ -48,21 +49,6 @@ public class NewsFeed extends AppCompatActivity {
         infoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
-                AlertDialog.Builder infoBuilder = new AlertDialog.Builder(NewsFeed.this);
-                infoBuilder.setTitle("About Simple News Reader");
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    infoBuilder.setView(R.layout.about_layout);
-                } else {
-                    infoBuilder.setMessage("Please refer to" +
-                                    "http://people.cs.clemson.edu/~bhglove/CPSC482/Assignment/assingment2.html."
-                                    + "Sorry about the inconvience."
-                    );
-                }
-
-                infoBuilder.create().show();
-                */
                 Intent intent = new Intent(NewsFeed.this, InfoActivity.class);
                 startActivity(intent);
             }
@@ -100,10 +86,16 @@ public class NewsFeed extends AppCompatActivity {
     // Overrides the back button to set NewsFeed as the new Main Screen
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        if(mData.getProgress() < 98){
+            Toast.makeText(getApplicationContext(), "Your articles is still downloading. Please Wait",
+                    Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
     }
 
     /**
