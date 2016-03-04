@@ -1,13 +1,17 @@
 package edu.cpsc4820.bhglove.simplenewsreader;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
+import android.util.LruCache;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -23,63 +27,133 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 /**
- * The DataModel class is a public class responsible for being the central hub of all data list,
- * with use of a singleton. This class also acts as the mediator to NewsFeed and Feeds, by storing
+ * The DataModel class is a public class responsible for being the central hub of all data,
+ * with use of a singleton. This class also acts as the controller to NewsFeed and Feeds, by storing
  * all list and adapters in this single class. DataModel first populates stored RSS feeds from the
  * class Feed and then parses the information from that feed into three separate ArrayLists from the
  * private class ParseRSS.
- *
  * Created by Benjamin Glover on 2/4/2016.
+ * V2.0
+ * The DataModel class was modified to incorporate an internal database
+ *
+ *
  *
  * Resources:
  *
  * Remove the image tag from html strings
  * http://stackoverflow.com/questions/11178533/how-to-skip-image-tag-in-html-data-in-android?answertab=active#tab-top
- *
- *
- */
+ * */
 public class DataModel {
 
     private static DataModel mData = null;
     private ArrayList<String> headlines; //The title of the articles
     private ArrayList<String> links;     //The weblink of the article
     private ArrayList<String> description; //A description of the article (Contains HTML data)
+    private ArrayList<String> images;
+    private ArrayList<String> dates;
+
     private ArrayList mListSelected;   //This is the selected feeds the user wants to display on the news feed
     private ArrayList mListAvailable;
     private Feeds feedList;
+    private DatabaseModel db = null;
+    private Context context;
+    private LruCache<String, Bitmap> mMemoryCache;
+
+    private int progress;
 
     /** Initialize variables and set the three preset RSS feeds. */
-   private DataModel(){
+   private DataModel(Context context){
        headlines = new ArrayList<String>();
        links = new ArrayList<String>();
        description = new ArrayList<String>();
+       images = new ArrayList<String>();
+       dates = new ArrayList<String>();
+
        mListAvailable = new ArrayList<String>();
        mListSelected = new ArrayList<String>();
-
-       feedList = new Feeds();
-       for(String s : feedList.getAllTitles()){
-           mListAvailable.add(s);
+       this.context = context;
+       progress = 0;
+       if(db == null){
+           db = new DatabaseModel(context);
        }
+       feedList = new Feeds();
+       for(int i = 0; i < feedList.getAllTitles().length; i++)
+              db.createNewFeed(feedList.getTitleAt(i), feedList.getLinkAt(i));
 
+       final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+       final int cacheSize = maxMemory / 8;
+
+       mMemoryCache = new LruCache<String, Bitmap>(cacheSize){
+           @Override
+            protected int sizeOf(String key, Bitmap bitmap){
+               return bitmap.getByteCount() / 1024;
+           }
+       };
    }
 
     /** Returns a single instance of the static DataModel
      *
-      * @return void
+     * @return void
      */
-    public static DataModel getInstance(){
-        if(mData == null) mData = new DataModel();
+    public static DataModel getInstance(Context context){
+        if(mData == null) mData = new DataModel(context);
 
         return mData;
     }
 
     /**
-     *  Mediator function that adds a new RSS Feed from class SelectCategory to the list in class Feeds
+     * Returns the bitmap associated to that key.
+     * @param key
+     * @return
+     */
+    public Bitmap getBitmapFromCache(String key){
+        return mMemoryCache.get(key);
+    }
+
+    /**
+     * Adds a Bitmap based on a key and also checks for duplicates.
+     * @param key
+     * @param bitmap
+     */
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap){
+        if(getBitmapFromCache(key) == null && bitmap != null){
+            mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    /**
+     * Public method to set a bitmap to an imageview. This is the method that updates in the
+     * listview.
+     * @param url
+     * @param imageView
+     */
+    public void loadBitmap(String url, ImageView imageView){
+        final String imageUrl = url;
+        final ImageView image = imageView;
+        final Bitmap bitmap = getBitmapFromCache(url);
+        if(bitmap != null){
+            imageView.setImageBitmap(bitmap);
+        }
+        else {
+            if(url.equals("www.exapmle.com")){
+                imageView.setImageResource(R.drawable.rss);
+            }
+            else{
+                DownloadArticleImage dl = new DownloadArticleImage(image);
+                dl.setContext(context);
+                dl.execute(imageUrl);
+            }
+        }
+    }
+
+    /**
+     *  Mediator function that adds a new RSS Feed from class Subscription to the list in class Feeds
      *  @param title
      *  @param link
      */
     public void createNewFeed(String title, String link){
-        feedList.addFeed(title, link);
+        //feedList.addFeed(title, link);
+        db.createNewFeed(title, link);
     }
 
     /**
@@ -93,7 +167,8 @@ public class DataModel {
             mListSelected.remove(oldTitle);
             mListSelected.add(title);
         }
-        feedList.editFeed(oldTitle, title, link);
+        //feedList.editFeed(oldTitle, title, link);
+        db.editFeed(oldTitle, title, link);
     }
 
     /**
@@ -102,42 +177,46 @@ public class DataModel {
      * @return
      */
     public String findLink(String title){
-        return feedList.findLink(title);
+        return db.findLink(title);
     }
 
     /**
      * Mediator function updates the added category to the selected category listview
      * @param value
      */
-    public void addToSelectedFeed(String value){
-        Log.d("Add", "Add to Selected" + value);
+    public void setSelected(String value){
+        Log.d("Add", "Add to Selected " + value);
         mListSelected.add(value);
         mListAvailable.remove(value);
+        db.setSelected(value);
     }
 
     /**
      * Mediator function updates the added category to the available category listview
      * @param value
      */
-    public void addToAvailableFeed(String value){
-        Log.d("Add", "Add to Available" + value);
+    public void setAvailable(String value){
+        Log.d("Add", "Add to Available " + value);
         mListAvailable.add(value);
         mListSelected.remove(value);
+        db.setAvailable(value);
     }
 
     /**
-     * Mediator function that allows SelectCategory to access all available RSS Feeds
+     * Mediator function that allows Subscription to access all available RSS Feeds
      * @return ArrayList
      */
-    public ArrayList getmListAvailable() {
+    public ArrayList getAvailable() {
+        mListAvailable = db.getAvailable();
         return mListAvailable;
     }
 
     /**
-     * Mediator function that allows SelectCategory to access all user selected RSS Feeds
+     * Mediator function that allows Subscription to access all user selected RSS Feeds
      * @return ArrayList
      */
-    public ArrayList getmListSelected() {
+    public ArrayList getSelected() {
+        mListSelected = db.getSelected();
         return mListSelected;
     }
 
@@ -146,6 +225,7 @@ public class DataModel {
      * @return ArrayList
      */
     public ArrayList<String> getHeadlines() {
+        headlines = db.getHeadlines();
         return headlines;
     }
 
@@ -154,6 +234,7 @@ public class DataModel {
      * @return ArrayList
      */
     public ArrayList<String> getLinks() {
+        links = db.getLinks();
         return links;
     }
 
@@ -161,35 +242,63 @@ public class DataModel {
      * Mediator function that returns all Descriptions for all articles
      * @return ArryList
      */
-    public ArrayList<String> getDescription() {
+    public ArrayList<String> getDescriptions() {
+        description = db.getDescriptions();
         return description;
+    }
+
+    /**
+     * Returns the image urls from the database.
+     * @return ArrayList Images stored in database.
+     */
+    public ArrayList<String> getImages(){
+        images = db.getImages();
+        return images;
+    }
+
+    /**
+     * Mediator function that returns the title of an article from the database.
+     * @param link Permalink of the article
+     * @return String Content Title
+     */
+    public String getContentTitle(String link){
+
+        return db.getContentRssTitle(db.getContentId(link));
+
+    }
+
+    /**
+     * Returns the Date associated with a particular article.
+     * @param link
+     * @return
+     */
+    public String getContentDate(String link){
+        return db.getContentDate(db.getContentId(link));
+    }
+
+    public ArrayList<String> getDates(){
+        return dates;
     }
 
     /**
      * Mediator function that returns all of the feed links to selected feeds.
      * @return String[]
      */
-    public String[] getAllSelectedFeed(){
-        String [] feed = new String[mListSelected.size()];
-        for(int i = 0; i < mListSelected.size(); i++)
-            feed[i] = feedList.findLink(mListSelected.get(i).toString());
-            //Deprecated
-            //feed[i] = PopularFeeds.valueOf(mListSelected.get(i).toString()).toFeed();
-
-        return feed;
+    public String[] getAllSelected(){
+       return db.getAllSelected();
     }
 
-    public void setAllSelected(String[] selected) {
-        for (String s : selected) {
-            mListSelected.add(s);
-        }
-    }
 
-    private void getData() {
+    /**
+     * By using the link of a particular rss feed, the method collects the information of the article:
+     * Headlines, Descriptions, Links, ImageUrl, and Date. And creates a new entry in the database.
+     * @param feedLink - RSS Link
+     */
+    private void parseDataFromXmlUrl(String feedLink) {
         ParseRSS mParseRss = new ParseRSS();
 
         try {
-            mParseRss.execute(mData.getAllSelectedFeed());
+            mParseRss.execute(feedLink);
             mParseRss.get();
 
         } catch (InterruptedException e) {
@@ -199,36 +308,101 @@ public class DataModel {
         }
 
         headlines = mParseRss.getmHeadlines();
-        links = mParseRss.getmLinks();
         description = mParseRss.getmDescription();
+        links = mParseRss.getmLinks();
+        images = mParseRss.getmImage();
+        dates = mParseRss.getmDate();
+
+        for(int i = 0; i < headlines.size(); i++){
+            db.createNewContent(feedLink, headlines.get(i), description.get(i), links.get(i),
+                    images.get(i), dates.get(i));
+        }
+    }
+
+    /**
+     * Returns the progress made by the thread downloading and parsing rss feeds.
+     * @return int
+     */
+    public int getProgress(){
+        return progress;
+    }
+    public void refreshDataContent(){
+        int i = 0;
+        progress = 0;
+        db.refreshContent();
+        if(mData.getAllSelected().length == 0){
+            progress = 100;
+        }
+        else {
+            for (String feed : mData.getAllSelected()) {
+                i++;
+                parseDataFromXmlUrl(feed);
+                progress = (100 / mData.getAllSelected().length) * i;
+                Log.d("Progress", "Progress at: " + progress);
+            }
+        }
     }
 
     /**
      * Returns the adapter needed for the NewsFeed ListView. Sets a description and article title.
+     *
+     * This array adapter uses a custom layout view to display an articles headline, description,
+     * and image thumbnail. The thumbnail should be roughly 100dp by 100dp.
+     * The original colors of the textviews were changed to blue for headlines and grey for
+     * article descriptions.
      * @param context
      * @return ArrayAdapter
      */
-    public ArrayAdapter createNewsFeedAdapter(Context context) {
+    public ArrayAdapter createNewsFeedAdapter(final Context context) {
         ArrayAdapter mArrayAdapter;
-
-        getData();
-
-        mArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_2, android.R.id.text1, headlines) {
+        /**
+         * Split the articles into pages using the SQL Statement TODO SPLIT INTO PAGES
+         */
+        mArrayAdapter = new ArrayAdapter<String>(context, R.layout.article, mData.getHeadlines()) {
 
             @Override
-            public View getView(int position, View convertView,
+            public View getView(final int position, View convertView,
                                 ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
+                if(convertView == null)
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.article, parent, false);
+                //Handler handler = new Handler();
+                final ImageView imageView = (ImageView) convertView.findViewById(R.id.article_imgview);
 
-                TextView textView1 = (TextView) view.findViewById(android.R.id.text1);
-                TextView textView2 = (TextView) view.findViewById(android.R.id.text2);
+                TextView textView1 = (TextView) convertView.findViewById(R.id.headline);
+                TextView textView2 = (TextView) convertView.findViewById(R.id.description);
+                TextView textView3 = (TextView) convertView.findViewById(R.id.pubDate);
+                TextView textView4 = (TextView) convertView.findViewById(R.id.rssTitle);
+
                 /*YOUR CHOICE OF COLOR*/
                 textView1.setTextColor(Color.BLUE);
                 textView1.setText(mData.getHeadlines().get(position));
                 textView2.setTextColor(Color.GRAY);
-                textView2.setText(Html.fromHtml(mData.getDescription().get(position).replaceAll("(<(/)img>)|(<img.+?>)", "")).toString().trim());
+                String description = Html.fromHtml(mData.getDescriptions().get(position).replaceAll("(<(/)img>)|(<img.+?>)", "")).toString().trim();
+                textView2.setText(description);
+                textView3.setText(getContentDate(mData.getLinks().get(position)));
 
-                return view;
+                textView3.setTextColor(Color.GRAY);
+
+                textView4.setTextColor(Color.GRAY);
+                textView4.setText(getContentTitle(mData.getLinks().get(position)));
+                try {
+                    String image = mData.getImages().get(position);
+                    if (image == null) {
+                        image = "www.example.com";
+                    }
+                    final String imageUrl = image;
+
+                    if(image.contains("www.example.com")) {
+                        imageView.setImageResource(R.drawable.rss);
+                        Log.d("Image", "Set stock image ");
+                    }
+                    else{
+                        loadBitmap(imageUrl, imageView);
+                    }
+                }catch (IndexOutOfBoundsException e){
+                    Log.d("Bounds", mData.getHeadlines().size() + " " + mData.getImages().size());
+                }
+                 return convertView;
             }
         };
         return mArrayAdapter;
@@ -237,10 +411,7 @@ public class DataModel {
     /**
      * Private class used to Parse RSS Feeds
      * Created by Benjamin Glover on 2/3/2016.
-     * <p/>
-     * <p/>
      * Resources:
-     * <p/>
      * Using Async task to fetch data in the background
      * http://stackoverflow.com/questions/20017448/android-app-force-close-when-sending-data-to-local-webserver-from-android
      * <p/>
@@ -254,34 +425,36 @@ public class DataModel {
         private ArrayList<String> mHeadlines;
         private ArrayList<String> mLinks;
         private ArrayList<String> mDescription;
-
+        private ArrayList<String> mImage;
+        private ArrayList<String> mDate;
 
         public ParseRSS() {
             mHeadlines = (ArrayList) new ArrayList<String>();
             mLinks = (ArrayList) new ArrayList<String>();
             mDescription = (ArrayList) new ArrayList<String>();
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            Log.i("Thread", "Background");
-            getRSSList(params);
-
-            return "Task Completed.";
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Log.i("Thread", "Pre Execute");
+            mImage = new ArrayList<String>();
+            mDate = new ArrayList<String>();
         }
 
         public ArrayList<String> getmHeadlines() {
             return mHeadlines;
         }
-
         public ArrayList<String> getmLinks() {
             return mLinks;
+        }
+        public ArrayList<String> getmDescription() {
+            return mDescription;
+        }
+        public ArrayList<String> getmImage() {
+            return mImage;
+        }
+        public ArrayList<String> getmDate() { return mDate; }
+
+        @Override
+        protected String doInBackground(String... params) {
+            Log.i("Thread", "Background");
+            getRSSList(params);
+            return "Task Completed.";
         }
 
         /**
@@ -293,6 +466,7 @@ public class DataModel {
             boolean retVal = false;
             Log.d("Feed", "There are " + feed.length + " selected feeds");
             for (int i = 0; i < feed.length; i++) {
+                Log.d("Feed", "Parsing: " + feed[i]);
                 try {
                     URL url = new URL(feed[i]);
 
@@ -322,19 +496,58 @@ public class DataModel {
                             if (xpp.getName().equalsIgnoreCase("item")) {
                                 insideItem = true;
                             } else if (xpp.getName().equalsIgnoreCase("title")) {
-                                if (insideItem)
+                                if (insideItem) {
                                     mHeadlines.add(xpp.nextText()); //extract the headline
+                                    Log.d("Feed", "Headline size:" + mHeadlines.size()
+                                            + " Image size" + mImage.size() + " Image Count:"
+                                            + mImage.size());
+                                }
                             } else if (xpp.getName().equalsIgnoreCase("link")) {
-                                if (insideItem)
+                                if (insideItem) {
                                     mLinks.add(xpp.nextText()); //extract the link of article
+                                }
                             } else if (xpp.getName().equalsIgnoreCase("description")) {
-                                if (insideItem)
+                                if (insideItem) {
                                     mDescription.add(xpp.nextText()); //extract the category
+                                }
+                                // Inspiration from this and studying the xml data allowed for parsing https://xjaphx.wordpress.com/2011/10/16/android-xml-adventure-parsing-xml-data-with-xmlpullparser/
+                            } else if(xpp.getName().contains("media:content") && (mImage.size() < mHeadlines.size())) {
+                                String imageUrl = xpp.getAttributeValue(null, "url");
+                                if(imageUrl != null)
+                                    Log.d("Feed", imageUrl);
+                                Log.d("Feed", "Image #" + mImage.size() + " " + imageUrl);
+                                if(imageUrl.contains(".jp") || imageUrl.contains(".png") || imageUrl.contains("image")) {
+                                    mImage.add(imageUrl);
+                                }
+                            }else if(xpp.getName().contains("media:thumbnail") && (mImage.size() < mHeadlines.size())) {
+                                String imageUrl = xpp.getAttributeValue(null, "url");
+                                if(imageUrl != null)
+                                    Log.d("Feed", imageUrl);
+                                Log.d("Feed", "Image #" + " " + imageUrl + mImage.size());
+
+                                if(imageUrl.contains(".jp") || imageUrl.contains(".png") || imageUrl.contains("image")) {
+                                    mImage.add(imageUrl);
+                                }
+                            } else if(xpp.getName().equalsIgnoreCase("thumbnail") && (mImage.size() < mHeadlines.size())){
+                                String imageUrl = xpp.nextText();
+                                if(imageUrl.contains(".jp") || imageUrl.contains(".png") || imageUrl.contains("image")) {
+                                    mImage.add(imageUrl);
+                                }
+                                Log.d("Feed", "Image #" + " " + imageUrl + mImage.size());
+                            } else if (xpp.getName().equalsIgnoreCase("pubDate")) {
+                                    mDate.add(xpp.nextText().substring(0, 17));
+                                    //Log.d("Date", feed[i] + ": " + xpp.nextText().substring(0, 17));
                             }
                         } else if (eventType == XmlPullParser.END_TAG && xpp.getName().equalsIgnoreCase("item")) {
+                            if(mHeadlines.size() > mImage.size()){
+                                Log.d("Feed", "headlines: " + mHeadlines.size() + " vs images: " +  mImage.size());
+                                mImage.add(null);
+                            }
+                            if(mHeadlines.size() > mDate.size()){
+                                mDate.add(" ");
+                            }
                             insideItem = false;
                         }
-
                         eventType = xpp.next(); //move to next element
                         retVal = true;
                     }
@@ -349,18 +562,9 @@ public class DataModel {
                     e.printStackTrace();
                     retVal = false;
                 }
+
             }
             return retVal;
-        }
-
-        @Override
-        protected void onPostExecute(String params) {
-            super.onPostExecute(params);
-            Log.i("Thread", "Post Execute");
-        }
-
-        public ArrayList<String> getmDescription() {
-            return mDescription;
         }
     }
 

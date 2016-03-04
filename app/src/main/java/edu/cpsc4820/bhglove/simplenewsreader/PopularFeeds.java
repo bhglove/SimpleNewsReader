@@ -14,7 +14,7 @@ package edu.cpsc4820.bhglove.simplenewsreader;
  */
 
 public enum PopularFeeds {
-    Clemson, IEEE, NYTimes;
+    Clemson, CNN, IEEE, NYTimes, ABC;
 
   static String[] allFeeds(){
       String[] feeds = new String[PopularFeeds.values().length];
@@ -30,25 +30,16 @@ public enum PopularFeeds {
       switch (this){
           case Clemson:
               return "http://newsstand.clemson.edu/feed/";
+          case CNN:
+              return "http://rss.cnn.com/rss/cnn_topstories.rss";
           case IEEE:
               return "http://feeds.feedburner.com/IeeeSpectrumFullText?format=xml";
           case NYTimes:
               return "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml";
+          case ABC:
+              return "http://feeds.abcnews.com/abcnews/topstories?format=xml";
           default:
             return null;
     }
   }
-
-    public String toReadableString() {
-        switch (this) {
-            case Clemson:
-                return "Clemson";
-            case IEEE:
-                return "IEEE";
-            case NYTimes:
-                return "NY Times";
-            default:
-                return null;
-        }
-    }
 }
