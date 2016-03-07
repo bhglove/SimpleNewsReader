@@ -12,7 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 /**
- *
+ * Prompts the user for internet permissions, automatically moves to either the login screen or
+ * the main screen.
  * Created by Benjamin Glover 02/03/2016
  *
  * Resources:
@@ -68,8 +69,6 @@ public class MainActivity extends AppCompatActivity{
                     startActivity(intent);
                 } else {
 
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                 }
                 return;
             }
@@ -78,25 +77,4 @@ public class MainActivity extends AppCompatActivity{
         // permissions this app might request
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }

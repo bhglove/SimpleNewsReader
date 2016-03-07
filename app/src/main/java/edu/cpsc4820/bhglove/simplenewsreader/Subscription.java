@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /***
@@ -62,7 +64,7 @@ public class Subscription extends AppCompatActivity {
                 TextView textView=(TextView) view.findViewById(android.R.id.text1);
 
             /*YOUR CHOICE OF COLOR*/
-                textView.setTextColor(Color.BLUE);
+                textView.setTextColor(Color.BLACK);
 
                 return view;
             }
@@ -71,7 +73,8 @@ public class Subscription extends AppCompatActivity {
 
         //Dispay a text view alerting the user that the list is empty.
         if(data.getSelected().isEmpty()){
-            mEmptyText.setText("List is empty");
+            mListView.setVisibility(View.INVISIBLE);
+            mEmptyText.setText(R.string.empty_subscriptions);
             mEmptyText.setVisibility(View.VISIBLE);
         }
         else{
@@ -170,7 +173,8 @@ public class Subscription extends AppCompatActivity {
 
                                     dialog.dismiss();
                                     if (data.getSelected().size() == 0) {
-                                        mEmptyText.setText("List is empty");
+                                        mListView.setVisibility(View.INVISIBLE);
+                                        mEmptyText.setText(R.string.empty_subscriptions);
                                         mEmptyText.setVisibility(View.VISIBLE);
                                     }
                                 }
@@ -193,7 +197,7 @@ public class Subscription extends AppCompatActivity {
             public void onClick(View v) {
 
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(Subscription.this);
-                dialogBuilder.setTitle("Select Category");
+                dialogBuilder.setTitle("Manage Subscriptions");
                 final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, data.getAvailable()) {
 
                     @Override

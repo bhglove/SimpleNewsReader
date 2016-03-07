@@ -6,7 +6,9 @@
     <string name="selected">Subscriptions</string>
     <string name="button_add_cat">Add News Source</string>
     <string name="text_empty_newsfeed">Your news feed is empty.\n\nTo add articles,
-        add a category using the Add Category Button</string>
+        add a news source using the \'Manage Subscriptions\' button.</string>
+    <string name="empty_subscriptions">You\'re not subscribed to a news source.\n\nAdd a news source
+    using the \'Manage Subscriptions\' button.</string>
     <string name="about">About</string>
     <string name="about_label_0">Information</string>
     <string name="about_label_1">Instructions</string>
@@ -33,6 +35,13 @@
     <string name="download_text">Your articles are currently downloading.</string>
     <string name="manage_subscriptions">Manage Subscriptions</string>
     <string name="info_button_context">Info Button</string>
+    <string name="title_activity_launch_page">LaunchPage</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="nav_button">Navigation Button</string>
+    <string name="version">version 3.0</string>
 
 
 </resources>

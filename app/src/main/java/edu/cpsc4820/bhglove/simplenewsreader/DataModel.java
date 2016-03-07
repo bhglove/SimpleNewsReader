@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
 import android.util.LruCache;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -352,6 +353,12 @@ public class DataModel {
      * article descriptions.
      * @param context
      * @return ArrayAdapter
+     *
+     * New Resources 3/6/2016
+     * Space between List View items
+     * http://stackoverflow.com/questions/4984313/spacing-between-listview-items-android
+     *
+     *
      */
     public ArrayAdapter createNewsFeedAdapter(final Context context) {
         ArrayAdapter mArrayAdapter;
@@ -402,7 +409,8 @@ public class DataModel {
                 }catch (IndexOutOfBoundsException e){
                     Log.d("Bounds", mData.getHeadlines().size() + " " + mData.getImages().size());
                 }
-                 return convertView;
+
+                return convertView;
             }
         };
         return mArrayAdapter;
