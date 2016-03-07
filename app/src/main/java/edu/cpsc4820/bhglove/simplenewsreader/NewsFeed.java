@@ -56,7 +56,7 @@ public class NewsFeed extends AppCompatActivity {
     private DataModel mData = null;
     private ProgressBar mProgressBar;
     private String[] mNavigationDrawerItemsTitles = {"News Feed", "Manage Subscriptions" ,
-            "Currently Reading", "My Favorites", "Settings"};
+            "Currently Reading", "My Favorites", "Settings", "Log Out"};
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
 
@@ -99,6 +99,7 @@ public class NewsFeed extends AppCompatActivity {
          * 3: Currently Reading: TODO: Make a tab view of articles
          * 4: My Favorites: TODO: Show favorites
          * 5: Settings: TODO: Show settings
+         * 6: Log Out: TODO: Log out
          */
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
