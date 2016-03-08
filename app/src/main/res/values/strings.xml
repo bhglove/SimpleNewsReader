@@ -8,7 +8,7 @@
     <string name="text_empty_newsfeed">Your news feed is empty.\n\nTo add articles,
         add a news source using the \'Manage Subscriptions\' button.</string>
     <string name="empty_subscriptions">You\'re not subscribed to a news source.\n\nAdd a news source
-    using the \'Manage Subscriptions\' button.</string>
+    using the \'Add News Source\' button.</string>
 
     <!-- Strings related to the Info Activity -->
     <!-- Labels -->
@@ -70,6 +70,8 @@
     <string name="user_fname_hint">First Name</string>
     <string name="user_lname_hint">Last Name</string>
     <string name="new_user_title">Welcome New User!</string>
+    <string name="notice_password">Note: passwords are not encrypted and are stored in plain text.
+        Please do not use your normal, daily used passwords.</string>
     <string name="register">Register</string>
     <!--- Strings for Register Dialog -->
     <string name="registration_title">Register New User</string>

@@ -18,8 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import edu.cpsc4820.bhglove.simplenewsreader.controller.DatabaseController;
 import edu.cpsc4820.bhglove.simplenewsreader.R;
+import edu.cpsc4820.bhglove.simplenewsreader.controller.DatabaseController;
 
 /***
  * 2/17/2016 SelectCategory renamed to Subscription
