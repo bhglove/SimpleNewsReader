@@ -1,11 +1,13 @@
 package edu.cpsc4820.bhglove.simplenewsreader.view;
 
-import android.content.Intent;
-import android.os.Bundle;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import edu.cpsc4820.bhglove.simplenewsreader.R;
 
@@ -36,8 +38,8 @@ public class Register extends AppCompatActivity {
     }
 
     public void register(View v){
-        Intent intent = new Intent(Register.this, NewsFeed.class);
-        startActivity(intent);
+
+        Toast.makeText(getApplicationContext(), "Register!", Toast.LENGTH_SHORT).show();
     }
 
     private boolean setEmail(String email){

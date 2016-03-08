@@ -26,9 +26,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-import edu.cpsc4820.bhglove.simplenewsreader.R;
 import edu.cpsc4820.bhglove.simplenewsreader.model.DatabaseModel;
 import edu.cpsc4820.bhglove.simplenewsreader.model.Feeds;
+import edu.cpsc4820.bhglove.simplenewsreader.R;
 
 /**
  * The DatabaseController class is a public class responsible for being the central hub of all data,

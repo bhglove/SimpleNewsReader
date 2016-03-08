@@ -22,8 +22,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import edu.cpsc4820.bhglove.simplenewsreader.R;
 import edu.cpsc4820.bhglove.simplenewsreader.controller.DatabaseController;
+import edu.cpsc4820.bhglove.simplenewsreader.R;
 
 /**
  * The main activity that displays the a list of articles along with descriptive attributes.
@@ -98,10 +98,6 @@ public class NewsFeed extends AppCompatActivity {
                 }
                 if(position == 1){
                     Intent intent = new Intent(NewsFeed.this, Subscription.class);
-                    startActivity(intent);
-                }
-                if(position == 5){
-                    Intent intent = new Intent(NewsFeed.this, LoginActivity.class);
                     startActivity(intent);
                 }
             }
