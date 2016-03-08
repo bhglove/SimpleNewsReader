@@ -1,4 +1,4 @@
-package edu.cpsc4820.bhglove.simplenewsreader;
+package edu.cpsc4820.bhglove.simplenewsreader.model;
 
 import android.util.Log;
 

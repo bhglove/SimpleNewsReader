@@ -1,40 +1,29 @@
-package edu.cpsc4820.bhglove.simplenewsreader;
+package edu.cpsc4820.bhglove.simplenewsreader.view;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ToolbarWidgetWrapper;
-import android.text.Layout;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
-import java.util.ArrayList;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import edu.cpsc4820.bhglove.simplenewsreader.controller.DatabaseController;
+import edu.cpsc4820.bhglove.simplenewsreader.R;
 
 /**
  * The main activity that displays the a list of articles along with descriptive attributes.
@@ -53,7 +42,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * */
 public class NewsFeed extends AppCompatActivity {
     private ListView mListView;
-    private DataModel mData = null;
+    private DatabaseController mData = null;
     private ProgressBar mProgressBar;
     private String[] mNavigationDrawerItemsTitles = {"News Feed", "Manage Subscriptions" ,
             "Currently Reading", "My Favorites", "Settings", "Log Out"};
@@ -120,7 +109,7 @@ public class NewsFeed extends AppCompatActivity {
         mProgressBar.setMax(100);
 
         if (mData == null)
-            mData = DataModel.getInstance(getApplicationContext());
+            mData = DatabaseController.getInstance(getApplicationContext());
 
         //Takes the user to the info activity
         ImageButton infoButton = (ImageButton) findViewById(R.id.infoButton);
@@ -193,7 +182,7 @@ public class NewsFeed extends AppCompatActivity {
     }
 
     /**
-     * Populates a list view with the provided adapter from DataModel
+     * Populates a list view with the provided adapter from DatabaseController
      */
     private void createListView() {
         Log.d("NewsFeed", "Creating List View");

@@ -1,4 +1,4 @@
-package edu.cpsc4820.bhglove.simplenewsreader;
+package edu.cpsc4820.bhglove.simplenewsreader.view;
 
 import android.Manifest;
 import android.content.Intent;
@@ -8,8 +8,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
+
+import edu.cpsc4820.bhglove.simplenewsreader.R;
 
 /**
  * Prompts the user for internet permissions, automatically moves to either the login screen or

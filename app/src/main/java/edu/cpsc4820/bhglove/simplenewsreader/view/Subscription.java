@@ -1,4 +1,4 @@
-package edu.cpsc4820.bhglove.simplenewsreader;
+package edu.cpsc4820.bhglove.simplenewsreader.view;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -17,8 +16,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import edu.cpsc4820.bhglove.simplenewsreader.controller.DatabaseController;
+import edu.cpsc4820.bhglove.simplenewsreader.R;
 
 /***
  * 2/17/2016 SelectCategory renamed to Subscription
@@ -29,7 +30,7 @@ public class Subscription extends AppCompatActivity {
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
     private TextView mEmptyText;
-    private DataModel data;
+    private DatabaseController data;
 
     @Override
     public void onBackPressed() {
@@ -44,7 +45,7 @@ public class Subscription extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select);
         if(data == null) {
-           data = DataModel.getInstance(getApplicationContext());
+           data = DatabaseController.getInstance(getApplicationContext());
         }
 
         mListView = (ListView) findViewById(R.id.categoryListView);

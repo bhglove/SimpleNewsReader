@@ -1,4 +1,4 @@
-package edu.cpsc4820.bhglove.simplenewsreader;
+package edu.cpsc4820.bhglove.simplenewsreader.model;
 
 /**
  * Maps the rss feed of a news category to a logical name.

@@ -1,4 +1,4 @@
-package edu.cpsc4820.bhglove.simplenewsreader;
+package edu.cpsc4820.bhglove.simplenewsreader.controller;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
 import android.util.LruCache;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,15 +26,19 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+import edu.cpsc4820.bhglove.simplenewsreader.model.DatabaseModel;
+import edu.cpsc4820.bhglove.simplenewsreader.model.Feeds;
+import edu.cpsc4820.bhglove.simplenewsreader.R;
+
 /**
- * The DataModel class is a public class responsible for being the central hub of all data,
+ * The DatabaseController class is a public class responsible for being the central hub of all data,
  * with use of a singleton. This class also acts as the controller to NewsFeed and Feeds, by storing
- * all list and adapters in this single class. DataModel first populates stored RSS feeds from the
+ * all list and adapters in this single class. DatabaseController first populates stored RSS feeds from the
  * class Feed and then parses the information from that feed into three separate ArrayLists from the
  * private class ParseRSS.
  * Created by Benjamin Glover on 2/4/2016.
  * V2.0
- * The DataModel class was modified to incorporate an internal database
+ * The DatabaseController class was modified to incorporate an internal database
  *
  *
  *
@@ -44,9 +47,9 @@ import java.util.concurrent.ExecutionException;
  * Remove the image tag from html strings
  * http://stackoverflow.com/questions/11178533/how-to-skip-image-tag-in-html-data-in-android?answertab=active#tab-top
  * */
-public class DataModel {
+public class DatabaseController {
 
-    private static DataModel mData = null;
+    private static DatabaseController mData = null;
     private ArrayList<String> headlines; //The title of the articles
     private ArrayList<String> links;     //The weblink of the article
     private ArrayList<String> description; //A description of the article (Contains HTML data)
@@ -63,7 +66,7 @@ public class DataModel {
     private int progress;
 
     /** Initialize variables and set the three preset RSS feeds. */
-   private DataModel(Context context){
+   private DatabaseController(Context context){
        headlines = new ArrayList<String>();
        links = new ArrayList<String>();
        description = new ArrayList<String>();
@@ -92,12 +95,12 @@ public class DataModel {
        };
    }
 
-    /** Returns a single instance of the static DataModel
+    /** Returns a single instance of the static DatabaseController
      *
      * @return void
      */
-    public static DataModel getInstance(Context context){
-        if(mData == null) mData = new DataModel(context);
+    public static DatabaseController getInstance(Context context){
+        if(mData == null) mData = new DatabaseController(context);
 
         return mData;
     }
@@ -327,6 +330,7 @@ public class DataModel {
     public int getProgress(){
         return progress;
     }
+
     public void refreshDataContent(){
         int i = 0;
         progress = 0;
@@ -375,23 +379,25 @@ public class DataModel {
                 //Handler handler = new Handler();
                 final ImageView imageView = (ImageView) convertView.findViewById(R.id.article_imgview);
 
-                TextView textView1 = (TextView) convertView.findViewById(R.id.headline);
-                TextView textView2 = (TextView) convertView.findViewById(R.id.description);
-                TextView textView3 = (TextView) convertView.findViewById(R.id.pubDate);
-                TextView textView4 = (TextView) convertView.findViewById(R.id.rssTitle);
+                TextView headlineTxtView = (TextView) convertView.findViewById(R.id.headline);
+                TextView descriptionTxtView = (TextView) convertView.findViewById(R.id.description);
+                TextView pubDateTxtView = (TextView) convertView.findViewById(R.id.pubDate);
+                TextView rssTitleTxtView = (TextView) convertView.findViewById(R.id.rssTitle);
 
                 /*YOUR CHOICE OF COLOR*/
-                textView1.setTextColor(Color.BLUE);
-                textView1.setText(mData.getHeadlines().get(position));
-                textView2.setTextColor(Color.GRAY);
+                headlineTxtView.setTextColor(Color.BLUE);
+                headlineTxtView.setText(mData.getHeadlines().get(position));
+
+
                 String description = Html.fromHtml(mData.getDescriptions().get(position).replaceAll("(<(/)img>)|(<img.+?>)", "")).toString().trim();
-                textView2.setText(description);
-                textView3.setText(getContentDate(mData.getLinks().get(position)));
+                descriptionTxtView.setText(description);
+                descriptionTxtView.setTextColor(Color.GRAY);
 
-                textView3.setTextColor(Color.GRAY);
+                pubDateTxtView.setText(getContentDate(mData.getLinks().get(position)));
+                pubDateTxtView.setTextColor(Color.GRAY);
 
-                textView4.setTextColor(Color.GRAY);
-                textView4.setText(getContentTitle(mData.getLinks().get(position)));
+                rssTitleTxtView.setTextColor(Color.GRAY);
+                rssTitleTxtView.setText(getContentTitle(mData.getLinks().get(position)));
                 try {
                     String image = mData.getImages().get(position);
                     if (image == null) {
@@ -409,7 +415,6 @@ public class DataModel {
                 }catch (IndexOutOfBoundsException e){
                     Log.d("Bounds", mData.getHeadlines().size() + " " + mData.getImages().size());
                 }
-
                 return convertView;
             }
         };

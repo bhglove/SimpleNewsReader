@@ -1,4 +1,4 @@
-package edu.cpsc4820.bhglove.simplenewsreader;
+package edu.cpsc4820.bhglove.simplenewsreader.model;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,10 +10,10 @@ import android.util.Log;
 import java.util.ArrayList;
 
 /**
- * DatabaseModel intended purpose is to act as model class for the classes DataModel and Feed.
+ * DatabaseModel intended purpose is to act as model class for the classes DatabaseController and Feed.
  * This class creates, modifies, and deletes tables needed to represent and populate the view
  * classes. The method names are directly ported and named the same for easy retrieval by the
- * DataModel class.
+ * DatabaseController class.
  *
  * Created by Benjamin Glover on 2/17/2016.
  */

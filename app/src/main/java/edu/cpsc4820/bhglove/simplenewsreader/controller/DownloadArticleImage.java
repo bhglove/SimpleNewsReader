@@ -1,4 +1,4 @@
-package edu.cpsc4820.bhglove.simplenewsreader;
+package edu.cpsc4820.bhglove.simplenewsreader.controller;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -20,7 +20,7 @@ import java.net.URLConnection;
 public class DownloadArticleImage extends AsyncTask<String, Void, Bitmap> {
     private final WeakReference<ImageView> imageView;
     private Context context = null;
-    private DataModel dataModel = null;
+    private DatabaseController databaseController = null;
 
 
 
@@ -36,7 +36,7 @@ public class DownloadArticleImage extends AsyncTask<String, Void, Bitmap> {
         if(context == null){
             cancel(true);
         }
-        dataModel = DataModel.getInstance(context);
+        databaseController = DatabaseController.getInstance(context);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class DownloadArticleImage extends AsyncTask<String, Void, Bitmap> {
                 }
             }
         }
-        dataModel.addBitmapToMemoryCache(String.valueOf(params[0]), result);
+        databaseController.addBitmapToMemoryCache(String.valueOf(params[0]), result);
         return result;
     }
 }

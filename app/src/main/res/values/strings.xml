@@ -9,11 +9,15 @@
         add a news source using the \'Manage Subscriptions\' button.</string>
     <string name="empty_subscriptions">You\'re not subscribed to a news source.\n\nAdd a news source
     using the \'Manage Subscriptions\' button.</string>
+
+    <!-- Strings related to the Info Activity -->
+    <!-- Labels -->
     <string name="about">About</string>
     <string name="about_label_0">Information</string>
     <string name="about_label_1">Instructions</string>
     <string name="about_label_2">Acknowledgements</string>
     <string name="about_label_3">New Technologies</string>
+    <!-- Description and Resources -->
     <string name="about_text">This android application parses RSS feeds and displays the contents
     into an easy to read and unified place.\n\nCreated by: Benjamin Glover (2/27/2016)
     </string>
@@ -30,6 +34,8 @@
         http://developer.android.com/intl/zh-tw/training/displaying-bitmaps/cache-bitmap.html
     </string>
     <string name="about_text_3">Image Caching\nThreads and Handler\nInner Join</string>
+
+    <!-- Strings Related to Activities-->
     <string name="title_activity_loading">LoadingActivity</string>
     <string name="article_img">Article Picture</string>
     <string name="download_text">Your articles are currently downloading.</string>
@@ -38,13 +44,13 @@
     <string name="title_activity_launch_page">LaunchPage</string>
     <string name="section_format">Hello World from section: %1$d</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Strings related to Navigation Bar -->
     <string name="nav_button">Navigation Button</string>
     <string name="version">version 3.0</string>
-    <string name="title_activity_login">Sign in</string>
+
 
     <!-- Strings related to login -->
+    <string name="title_activity_login">Sign in</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
     <string name="action_sign_in">Sign in or register</string>
@@ -56,6 +62,19 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <!-- Strings related to Register Activity -->
+    <string name="title_activity_register">Register</string>
+    <string name="user_email_hint">Email</string>
+    <string name="user_passord_hint">Password</string>
+    <string name="user_confirm_hint">Confirm Password</string>
+    <string name="user_fname_hint">First Name</string>
+    <string name="user_lname_hint">Last Name</string>
+    <string name="new_user_title">Welcome New User!</string>
+    <string name="register">Register</string>
+    <!--- Strings for Register Dialog -->
+    <string name="registration_title">Register New User</string>
+    <string name="registration_prompt">It seems like you don\'t have an account for this email
+    address.\n\nWould you like to register for one?</string>
 
 
 </resources>

@@ -1,8 +1,10 @@
-package edu.cpsc4820.bhglove.simplenewsreader;
+package edu.cpsc4820.bhglove.simplenewsreader.view;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
+
+import edu.cpsc4820.bhglove.simplenewsreader.R;
 
 public class InfoActivity extends AppCompatActivity {
 
