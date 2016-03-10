@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,6 +33,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.List;
 import edu.cpsc4820.bhglove.simplenewsreader.R;
@@ -93,6 +96,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+    }
+
+    @Override
+    public void onBackPressed() {
+        //Returns the user to the home menu and clears the stack of old activities
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+
     }
 
     private void populateAutoComplete() {
@@ -307,20 +320,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Integer doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
             int retVal = 0;
-            AccessDatabase access = new AccessDatabase();
+            AccessDatabase access = AccessDatabase.getInstance();
             try {
-                // Simulate network access.
-                if(mPassword.contains("button") && (mEmail.contains("benjioscereal"))){
-                    retVal = 1;
-                }
-                else {
-                    retVal = -1;
-                }
-                //retVal = access.executeLogin(mEmail, mPassword);
-                Log.d("Access", "Returned value: " + retVal);
+                //Connect to the database and try to authenticate
+                retVal = access.executeLogin(mEmail, mPassword);
+
                 Thread.sleep(200);
             } catch (InterruptedException e) {
-                Log.d("Access", "Something funky happend in thread");
+
             }
 
             return retVal;

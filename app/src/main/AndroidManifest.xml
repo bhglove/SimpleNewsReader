@@ -32,7 +32,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.Register"></activity>
+        <activity android:name=".view.Register" />
+        <activity android:name=".view.SettingsActivity" />
+        <activity android:name=".view.FavoriteArticleActivity"></activity>
     </application>
 
 </manifest>

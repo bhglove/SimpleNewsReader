@@ -46,7 +46,7 @@
 
     <!-- Strings related to Navigation Bar -->
     <string name="nav_button">Navigation Button</string>
-    <string name="version">version 3.0</string>
+    <string name="version">Version: 3.0 Pre-Alpha</string>
 
 
     <!-- Strings related to login -->
@@ -71,10 +71,16 @@
     <string name="user_lname_hint">Last Name</string>
     <string name="new_user_title">Welcome New User!</string>
     <string name="register">Register</string>
+    <string name="prompt_notice">Note: \nPasswords are not encrypted and are stored in plain text.
+    \nPlease do not use your daily used passwords.\nExample Passwords: tigers, clemson, or password
+    </string>
     <!--- Strings for Register Dialog -->
     <string name="registration_title">Register New User</string>
     <string name="registration_prompt">It seems like you don\'t have an account for this email
     address.\n\nWould you like to register for one?</string>
-
+    <string name="nav_fname">Barack</string>
+    <string name="nav_lname">Obama</string>
+    <string name="hello">Hello, </string>
+    <string name="title_activity_settings">Settings</string>
 
 </resources>

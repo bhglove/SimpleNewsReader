@@ -29,7 +29,9 @@ import edu.cpsc4820.bhglove.simplenewsreader.R;
 public class Subscription extends AppCompatActivity {
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
+    private TextView mSubscriptionTitle;
     private TextView mEmptyText;
+
     private DatabaseController data;
 
     @Override
@@ -49,9 +51,10 @@ public class Subscription extends AppCompatActivity {
         }
 
         mListView = (ListView) findViewById(R.id.categoryListView);
-        mEmptyText = (TextView) findViewById(R.id.textView);
+        mSubscriptionTitle = (TextView) findViewById(R.id.textView);
+        mEmptyText = (TextView) findViewById(R.id.empty_list);
 
-        mEmptyText.setVisibility(View.INVISIBLE);
+        mSubscriptionTitle.setVisibility(View.VISIBLE);
 
         //Set the adapter for the selected feed list (on main screen)
 
@@ -79,7 +82,6 @@ public class Subscription extends AppCompatActivity {
             mEmptyText.setVisibility(View.VISIBLE);
         }
         else{
-            mEmptyText.setText(R.string.selected);
             mEmptyText.setVisibility(View.VISIBLE);
             mListView.setVisibility(View.VISIBLE);
         }
@@ -230,8 +232,6 @@ public class Subscription extends AppCompatActivity {
                         adapter.notifyDataSetChanged();
 
                         mListView.setVisibility(View.VISIBLE);
-                        mEmptyText.setText(R.string.selected);
-                        mEmptyText.setVisibility(View.VISIBLE);
                         dialog.dismiss();
                     }
                 });
@@ -271,8 +271,8 @@ public class Subscription extends AppCompatActivity {
                                                     data.createNewFeed(title, link);
 
                                                     if (data.getSelected().size() == 0) {
-                                                        mEmptyText.setText(R.string.selected);
-                                                        mEmptyText.setVisibility(View.VISIBLE);
+                                                        mSubscriptionTitle.setText(R.string.selected);
+                                                        mSubscriptionTitle.setVisibility(View.VISIBLE);
                                                     }
 
                                                     data.getSelected().add(title);

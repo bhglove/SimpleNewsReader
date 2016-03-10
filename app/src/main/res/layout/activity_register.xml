@@ -16,20 +16,38 @@
         android:text="@string/new_user_title"
         android:id="@+id/newUser"
         android:textSize="20sp"
-        android:layout_alignParentBottom="false"
+        android:elegantTextHeight="true"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentStart="false"
-        android:layout_alignParentTop="true" />
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/prompt_notice"
+        android:id="@+id/promptPassword"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="41dp"
+        android:layout_below="@+id/newUser"
+        android:layout_centerHorizontal="true" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_centerInParent="true"
+        android:visibility="invisible" />
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/linearLayout2"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/newUser"
+        android:layout_centerHorizontal="true"
         android:layout_above="@+id/linearLayout3"
+        android:layout_below="@+id/promptPassword"
         android:layout_margin="30dp">
 
         <EditText
@@ -39,7 +57,7 @@
             android:textColor="@android:color/darker_gray"
             android:hint="@string/user_email_hint"
             android:inputType="textEmailAddress"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="20dp" />
 
         <EditText
             android:layout_width="match_parent"
@@ -70,18 +88,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/firstName"
-            android:hint="@string/user_fname_hint" />
+            android:hint="@string/user_fname_hint"
+            android:singleLine="true"
+            android:inputType="textPersonName" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/lastName"
-            android:hint="@string/user_lname_hint" />
+            android:hint="@string/user_lname_hint"
+            android:singleLine="true"
+            android:inputType="textPersonName" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/linearLayout3"

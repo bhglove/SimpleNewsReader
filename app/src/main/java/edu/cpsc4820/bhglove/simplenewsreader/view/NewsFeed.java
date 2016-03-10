@@ -38,13 +38,14 @@ import edu.cpsc4820.bhglove.simplenewsreader.R;
  * Tool Bar:
  * #How To: https://www.codeofaninja.com/2014/02/android-navigation-drawer-example.html
  * #Fix Null Error: http://stackoverflow.com/questions/27469219/toolbar-findviewbyid-returning-null
+ * #Fix The Width: http://stackoverflow.com/questions/31399400/how-do-i-fill-the-width-of-the-screen-with-my-toolbar-using-an-android-gridlayou
  *
  * */
 public class NewsFeed extends AppCompatActivity {
     private ListView mListView;
     private DatabaseController mData = null;
     private ProgressBar mProgressBar;
-    private String[] mNavigationDrawerItemsTitles = {"News Feed", "Manage Subscriptions" ,
+    private static String[] mNavigationDrawerItemsTitles = {"News Feed", "Manage Subscriptions" ,
             "Currently Reading", "My Favorites", "Settings", "Log Out"};
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -83,22 +84,48 @@ public class NewsFeed extends AppCompatActivity {
         mDrawerList.setAdapter(drawerAdapter);
         /**
          * Implements functionality for the navigation bar.
-         * 1: News Feed: Closes the navigation bar.
-         * 2: Manage Subscriptions: Activates the subscription activity
-         * 3: Currently Reading: TODO: Make a tab view of articles
-         * 4: My Favorites: TODO: Show favorites
-         * 5: Settings: TODO: Show settings
-         * 6: Log Out: TODO: Log out
+         * 0: News Feed: Closes the navigation bar.
+         * 1: Manage Subscriptions: Activates the subscription activity
+         * 2: Currently Reading: TODO: Make a tab view of articles
+         * 3: My Favorites:
+         * 4: Settings:
+         * 5: Log Out:
          */
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(position == 0){
-                    onBackPressed();
-                }
-                if(position == 1){
-                    Intent intent = new Intent(NewsFeed.this, Subscription.class);
-                    startActivity(intent);
+                switch (position){
+                    case (0):{
+                        onBackPressed();
+                        break;
+                    }
+                    case (1):{
+                        Intent intent = new Intent(NewsFeed.this, Subscription.class);
+                        startActivity(intent);
+                        break;
+                    }
+                    case (2):{
+                        Toast.makeText(getApplicationContext(), "WIP", Toast.LENGTH_SHORT).show();
+                        onBackPressed();
+                        break;
+                    }
+                    case (3):{
+                        Intent intent = new Intent(NewsFeed.this, FavoriteArticleActivity.class);
+                        startActivity(intent);
+                        onBackPressed();
+                        break;
+                    }
+                    case (4):{
+                        Intent intent = new Intent(NewsFeed.this, SettingsActivity.class);
+                        startActivity(intent);
+                        onBackPressed();
+                        break;
+                    }
+                    case (5):{
+                        Intent intent = new Intent(NewsFeed.this, LoginActivity.class);
+                        startActivity(intent);
+                        break;
+                    }
                 }
             }
         });
@@ -140,7 +167,7 @@ public class NewsFeed extends AppCompatActivity {
                 try {
                     mData.refreshDataContent();
                     while (mData.getProgress() < 98) {
-                        Thread.sleep(500);
+                        Thread.sleep(200);
                     }
                 }catch (InterruptedException e) {
                     e.printStackTrace();
@@ -219,6 +246,7 @@ public class NewsFeed extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(NewsFeed.this, ArticleActivity.class);
+                intent.putExtra("Title", mData.getHeadlines().get(position).toString());
                 intent.putExtra("Link", mData.getLinks().get(position).toString());
                 startActivity(intent);
             }
