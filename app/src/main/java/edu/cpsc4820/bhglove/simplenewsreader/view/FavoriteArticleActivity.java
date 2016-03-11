@@ -16,11 +16,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import edu.cpsc4820.bhglove.simplenewsreader.R;
+import edu.cpsc4820.bhglove.simplenewsreader.controller.AccessDatabase;
 import edu.cpsc4820.bhglove.simplenewsreader.controller.DatabaseController;
 
 public class FavoriteArticleActivity extends AppCompatActivity {
     private ListView mListView;
-    private DatabaseController mData = null;
+    private AccessDatabase mData = null;
     private ProgressBar mProgressBar;
 
     @Override
@@ -34,14 +35,14 @@ public class FavoriteArticleActivity extends AppCompatActivity {
         mProgressBar.setMax(100);
 
         if (mData == null)
-            mData = DatabaseController.getInstance(getApplicationContext());
+            mData = AccessDatabase.getInstance(getApplicationContext());
 
         //Handler to offset the download of RSS Content to another thread.
         final Handler handler = new Handler();
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                final TextView downloading = (TextView) findViewById(R.id.downloadingText);
+                final TextView downloading = (TextView) findViewById(R.id.downloadingText2);
                 downloading.setVisibility(View.VISIBLE);
                 try {
                     mData.refreshFavoriteContent();
@@ -68,9 +69,9 @@ public class FavoriteArticleActivity extends AppCompatActivity {
      */
     private void createListView() {
         Log.d("Favorites", "Creating List View");
-        mListView = (ListView) findViewById(R.id.newsFeedView);
+        mListView = (ListView) findViewById(R.id.favoriteListView);
 
-        ArrayAdapter<String> adapter = mData.createNewsFeedAdapter(getApplicationContext());
+        ArrayAdapter<String> adapter = mData.createFavoritesAdapter(getApplicationContext());
         mListView.setAdapter(adapter);
         TextView empty = (TextView) findViewById(R.id.emptyFavoritesFeed);
 

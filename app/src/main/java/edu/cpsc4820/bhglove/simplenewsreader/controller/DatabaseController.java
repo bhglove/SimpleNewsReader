@@ -182,8 +182,8 @@ public class DatabaseController {
      * @param title
      * @return
      */
-    public String findLink(String title){
-        return db.findLink(title);
+    public String findRssLink(String title){
+        return db.findRssLink(title);
     }
 
     /**
@@ -226,7 +226,49 @@ public class DatabaseController {
         return mListSelected;
     }
 
+    /**
+     * Receives the associated headline of an article.
+     * @param link
+     * @return
+     */
+   public String getContentHeadline(String link){
+       String retVal;
+       retVal = db.getKeyContentHeadline(link);
+       return retVal;
+   }
 
+    /**
+     * Receives the associated description of an article.
+     * @param link
+     * @return
+     */
+    public String getContentDescription(String link){
+        String retVal;
+        retVal = db.getKeyContentDescription(link);
+        return retVal;
+    }
+
+    /**
+     * Receives the associated image url of an article.
+     * @param link
+     * @return
+     */
+    public String getContentImageUrl(String link){
+        String retVal;
+        retVal = db.getKeyContentImgLink(link);
+        return retVal;
+    }
+
+    /**
+     * Receives the associated date id of an article.
+     * @param link
+     * @return
+     */
+    public int getContentDateInt(String link){
+        int retVal;
+        retVal = db.getKeyContentDateId(link);
+        return retVal;
+    }
 
     /**
      * Mediator function that returns the Titles for all articles
@@ -270,9 +312,7 @@ public class DatabaseController {
      * @return String Content Title
      */
     public String getContentTitle(String link){
-
         return db.getContentRssTitle(db.getContentId(link));
-
     }
 
     /**
@@ -352,11 +392,7 @@ public class DatabaseController {
         }
     }
 
-    public void refreshFavoriteContent(){
-        progress = 0;
-        //TODO access refresh content
-        //TODO populate the array list using access
-    }
+
 
     /**
      * Returns the adapter needed for the NewsFeed ListView. Sets a description and article title.

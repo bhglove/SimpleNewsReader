@@ -48,19 +48,43 @@ public class AccessDatabase {
     private static AccessDatabase access = null;
     private static final String dbUrl =
             "http://people.cs.clemson.edu/~bhglove/CPSC482/Assignments/Assignment4Portal/";
+    public final String LOGIN = "login.php";
+    public final String REGISTER = "register.php";
+    public final String USER_INFO = "getNameFromEmail.php";
+    public final String ADD_RSS = "addRss.php";
+
+
     private ArrayList<String> favHeadlines; //The title of the articles
     private ArrayList<String> favLinks;     //The weblink of the article
     private ArrayList<String> favDescription; //A description of the article (Contains HTML data)
     private ArrayList<String> favImages;
-    DatabaseController mData;
+    private int progress;
+    private DatabaseController mData;
+
     private  AccessDatabase(Context context){
         mData = mData.getInstance(context);
+        favHeadlines = new ArrayList<String>();
+        favLinks = new ArrayList<String>();
+        favDescription = new ArrayList<String>();
+        favImages = new ArrayList<String>();
     }
 
     public static AccessDatabase getInstance(Context context){
         if(access == null) access = new AccessDatabase(context);
         return access;
     }
+
+    public int getProgress(){
+        return progress;
+    }
+
+    public void refreshFavoriteContent(){
+        progress = 0;
+        //TODO access refresh content
+        //TODO populate the array list using access
+        progress = 100;
+    }
+
     /**
      * Mediator function that returns the Titles for all articles
      * @return ArrayList
@@ -101,9 +125,6 @@ public class AccessDatabase {
         return favImages;
     }
     
-    public void refreshFavoriteContent(){
-        //TODO Set arraylists
-    }
 
     public String getContentDate(String link){
         return null;
@@ -113,12 +134,12 @@ public class AccessDatabase {
         return null;
     }
 
-    private String getFirstName(String email){
+
+    public String executeForString(String variables, String php){
         String retVal = " ";
         try {
-            String variables = "email=" + email;
             byte[] postData = variables.getBytes();
-            URL url = new URL(dbUrl + "getFromEmail.php");
+            URL url = new URL(dbUrl + php);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Connection", "Keep-Alive");
@@ -136,9 +157,7 @@ public class AccessDatabase {
                 builder.append(line);
             }
             reader.close();
-            JSONObject jObject = new JSONObject(builder.toString());
-            Log.d("Name", "Result: " + builder.toString());
-            retVal = jObject.getString("fname");
+            retVal = builder.toString();
             conn.disconnect();
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -146,61 +165,15 @@ public class AccessDatabase {
         } catch (IOException e) {
             e.printStackTrace();
             Log.d("IO", "IO Exception: " + e.getLocalizedMessage());
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.d("JSON", "JSON ERROR: " + e.getLocalizedMessage());
         }
         return retVal;
     }
 
-    private String getLastName(String email){
-        String retVal = " ";
-        try {
-            String variables = "email=" + email;
-            byte[] postData = variables.getBytes();
-            URL url = new URL(dbUrl + "getFromEmail.php");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Connection", "Keep-Alive");
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            conn.setRequestProperty("charset", "utf-8");
-            conn.setRequestProperty("Content-Length", Integer.toString(postData.length));
-            conn.setUseCaches(false);
-
-            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-            wr.write(postData);
-            wr.close();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder builder = new StringBuilder();
-            for(String line = reader.readLine(); line != null; line = reader.readLine()){
-                builder.append(line);
-            }
-            reader.close();
-            JSONObject jObject = new JSONObject(builder.toString());
-            Log.d("Name", "Result: " + builder.toString());
-            retVal = jObject.getString("lname");
-            conn.disconnect();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            Log.d("URL", "Malformed Url: " + e.getLocalizedMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d("IO", "IO Exception: " + e.getLocalizedMessage());
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.d("JSON", "JSON ERROR: " + e.getLocalizedMessage());
-        }
-        return retVal;
-    }
-
-
-    public int executeRegisterUser(String email, String password, String fname, String lname){
+    public int executeForInt(String variables, String php){
         int retVal = 0;
         try {
-            String variables = "email=" + email + "&password=" + password + "&fname=" + fname +
-                    "&lname=" +lname;
             byte[] postData = variables.getBytes();
-            URL url = new URL(dbUrl + "register.php");
+            URL url = new URL(dbUrl + php);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Connection", "Keep-Alive");
@@ -234,52 +207,6 @@ public class AccessDatabase {
         }
         return retVal;
     }
-    /**
-     * Connects to an authentication script via method post
-     * @param email
-     * @param password
-     * @return 1 - for successful 0 - for wrong password -1 - for the account does not exist.
-     */
-    public int executeLogin(String email, String password){
-        int retVal = 0;
-        try {
-            String variables = "email=" + email + "&password=" + password;
-            byte[] postData = variables.getBytes();
-            URL url = new URL(dbUrl + "login.php");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Connection", "Keep-Alive");
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            conn.setRequestProperty("charset", "utf-8");
-            conn.setRequestProperty("Content-Length", Integer.toString(postData.length));
-            conn.setUseCaches(false);
-
-            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-            wr.write(postData);
-            wr.close();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder builder = new StringBuilder();
-            for(String line = reader.readLine(); line != null; line = reader.readLine()){
-                builder.append(line);
-            }
-            reader.close();
-            JSONObject jObject = new JSONObject(builder.toString());
-            retVal = jObject.getInt("result");
-            conn.disconnect();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            Log.d("URL", "Malformed Url: " + e.getLocalizedMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d("IO", "IO Exception: " + e.getLocalizedMessage());
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.d("JSON", "JSON ERROR: " + e.getLocalizedMessage());
-        }
-        return retVal;
-    }
-
-
 
     public ArrayAdapter createFavoritesAdapter(final Context context) {
         ArrayAdapter mArrayAdapter;
@@ -294,7 +221,6 @@ public class AccessDatabase {
                                 ViewGroup parent) {
                 if(convertView == null)
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.article, parent, false);
-                //Handler handler = new Handler();
                 final ImageView imageView = (ImageView) convertView.findViewById(R.id.article_imgview);
 
                 TextView headlineTxtView = (TextView) convertView.findViewById(R.id.headline);

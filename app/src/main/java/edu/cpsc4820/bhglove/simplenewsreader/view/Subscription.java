@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -18,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import edu.cpsc4820.bhglove.simplenewsreader.controller.AccessDatabase;
 import edu.cpsc4820.bhglove.simplenewsreader.controller.DatabaseController;
 import edu.cpsc4820.bhglove.simplenewsreader.R;
 
@@ -116,7 +118,7 @@ public class Subscription extends AppCompatActivity {
                             //String feed = PopularFeeds.valueOf(item).toFeed();
                             //** Formatting for the dialog text. **/
                             String title = item;
-                            String feed = data.findLink(title);
+                            String feed = data.findRssLink(title);
 
 
                             rssTitle.setText(title);
@@ -197,7 +199,7 @@ public class Subscription extends AppCompatActivity {
         Button addButton = (Button) findViewById(R.id.buttonAddCat);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
 
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(Subscription.this);
                 dialogBuilder.setTitle("Manage Subscriptions");
@@ -281,6 +283,10 @@ public class Subscription extends AppCompatActivity {
                                                     mAdapter.clear();
                                                     mAdapter.addAll(data.getSelected());
                                                     mAdapter.notifyDataSetChanged();
+
+                                                    String varables = "title="+title+"&link"+link;
+                                                    AddRss add = new AddRss();
+                                                    add.execute(varables);
                                                 }
                                             }
                                         }
@@ -294,5 +300,15 @@ public class Subscription extends AppCompatActivity {
                 dialogBuilder.show();
             }
         });
+    }
+
+    private class AddRss extends AsyncTask<String, Void, Integer>{
+
+        @Override
+        protected Integer doInBackground(String... params) {
+            String variables = params[0];
+            AccessDatabase access = AccessDatabase.getInstance(getApplicationContext());
+            return access.executeForInt(variables, access.ADD_RSS);
+        }
     }
 }

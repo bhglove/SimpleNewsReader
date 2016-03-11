@@ -4,9 +4,12 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +37,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -310,6 +316,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     public class UserLoginTask extends AsyncTask<Void, Void, Integer> {
         private final String mEmail;
         private final String mPassword;
+        private String fname;
+        private String lname;
+        private int userId;
+
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -318,16 +328,27 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Integer doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
             int retVal = 0;
-            AccessDatabase access = AccessDatabase.getInstance();
+            AccessDatabase access = AccessDatabase.getInstance(getApplicationContext());
             try {
                 //Connect to the database and try to authenticate
-                retVal = access.executeLogin(mEmail, mPassword);
+                //retVal = access.executeLogin(mEmail, mPassword);
+                String variables = "email=" + mEmail + "&password=" + mPassword;
+                retVal = access.executeForInt(variables, access.LOGIN);
+                if(retVal == 1) {
+                    variables = "email=" + mEmail;
+                    JSONObject object = new JSONObject(access.executeForString(variables, access.USER_INFO));
 
+                    userId = object.getInt("user_id");
+                    fname = object.getString("fname");
+                    lname = object.getString("lname");
+                    Log.d("Name", "From object: " + fname + " " + lname);
+                }
                 Thread.sleep(200);
             } catch (InterruptedException e) {
 
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
 
             return retVal;
@@ -340,6 +361,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             Log.d("Access", "Post got: " + value);
             if (value == 1) {
                 finish();
+
+                SharedPreferences.Editor editor = getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE).edit();
+                editor.putInt(MainActivity.KEY_USERID, userId);
+                editor.putString(MainActivity.KEY_FNAME, fname);
+                editor.putString(MainActivity.KEY_LNAME, lname);
+                Log.d("Names", fname + " " + lname);
+                editor.commit();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
             } else if(value == -1){

@@ -1,5 +1,6 @@
 package edu.cpsc4820.bhglove.simplenewsreader.view;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -15,6 +16,9 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import edu.cpsc4820.bhglove.simplenewsreader.R;
 import edu.cpsc4820.bhglove.simplenewsreader.controller.AccessDatabase;
@@ -107,10 +111,24 @@ public class Register extends AppCompatActivity {
         protected Integer doInBackground(Void ...params) {
             Integer retVal =  0;
             try{
-                AccessDatabase access = AccessDatabase.getInstance();
-                retVal = access.executeRegisterUser(email, password, fname, lname);
+                AccessDatabase access = AccessDatabase.getInstance(getApplicationContext());
+                String variables = "email=" + email + "&password=" + password + "&fname=" + fname +
+                        "&lname=" +lname;
+                retVal = access.executeForInt(variables, access.REGISTER);
+                variables = "email=" + email;
+                JSONObject object = new JSONObject(access.executeForString(variables, access.USER_INFO));
+                int userId = object.getInt("user_id");
+                SharedPreferences.Editor editor = getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE).edit();
+
+                editor.putInt(MainActivity.KEY_USERID, userId);
+                editor.putString(MainActivity.KEY_FNAME, fname);
+                editor.putString(MainActivity.KEY_LNAME, lname);
+                editor.commit();
+
                 Thread.sleep(200);
             } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
             return retVal;

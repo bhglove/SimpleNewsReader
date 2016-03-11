@@ -39,6 +39,7 @@
     <string name="title_activity_loading">LoadingActivity</string>
     <string name="article_img">Article Picture</string>
     <string name="download_text">Your articles are currently downloading.</string>
+    <string name="download_text2">Your favorites are currently downloading.</string>
     <string name="manage_subscriptions">Manage Subscriptions</string>
     <string name="info_button_context">Info Button</string>
     <string name="title_activity_launch_page">LaunchPage</string>
@@ -85,6 +86,8 @@
 
 
     <string name="article_fav_button">Favorite Button</string>
+    <string name="article_title">Title</string>
     <string name="fav_articles_title">Favorites</string>
     <string name="settings_title">Settings</string>
+    <string name="empty_favorites">No favorites</string>
 </resources>

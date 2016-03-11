@@ -33,22 +33,37 @@
         android:layout_height="wrap_content"
         android:id="@+id/favoriteListView"
         android:layout_gravity="center_horizontal"
-        android:layout_below="@+id/relativeLayout" />
+        android:layout_below="@+id/relativeLayout"
+        android:visibility="invisible" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:text="@string/empty_favorites"
         android:id="@+id/emptyFavoritesFeed"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:visibility="invisible"
+        android:layout_below="@+id/progressBar3"
+        android:layout_alignLeft="@+id/progressBar3"
+        android:layout_alignStart="@+id/progressBar3"
+        android:layout_marginTop="120dp" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/progressBar3"
+        android:visibility="invisible"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/download_text2"
+        android:id="@+id/downloadingText2"
+        android:layout_alignTop="@+id/favoriteListView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="58dp"
+        android:visibility="invisible" />
 
 </RelativeLayout>

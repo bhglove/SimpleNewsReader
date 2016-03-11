@@ -263,6 +263,90 @@ public class DatabaseModel extends SQLiteOpenHelper{
     }
 
     /**
+     * Returns the associated headline of a given content link.
+     * @param link - Content Permalink
+     * @return - Headline of an Article
+     */
+    public String getKeyContentHeadline(String link){
+        String retVal;
+        SQLiteDatabase db = this.getWritableDatabase();
+        String SELECT =  "SELECT " + KEY_CONTENT_HEADLINE + " FROM " + TABLE_CONTENT + " WHERE "
+                + KEY_CONTENT_PERMALINK + "=\"" + link + "\"";
+
+        Cursor cursor = db.rawQuery(SELECT, null);
+        cursor.moveToFirst();
+        if(cursor.getCount() == 1)
+            retVal = cursor.getString(0);
+        else
+            retVal = " ";
+        cursor.close();
+        return retVal;
+    }
+
+    /**
+     * Returns the associated description of a given content link.
+     * @param link - Content Permalink
+     * @return - Description of an Article
+     */
+    public String getKeyContentDescription(String link){
+        String retVal;
+        SQLiteDatabase db = this.getWritableDatabase();
+        String SELECT =  "SELECT " + KEY_CONTENT_DESCRIPTION + " FROM " + TABLE_CONTENT + " WHERE "
+                + KEY_CONTENT_PERMALINK + "=\"" + link + "\"";
+
+        Cursor cursor = db.rawQuery(SELECT, null);
+        cursor.moveToFirst();
+        if(cursor.getCount() == 1)
+            retVal = cursor.getString(0);
+        else
+            retVal = " ";
+        cursor.close();
+        return retVal;
+    }
+
+    /**
+     * Returns the associated image url of a given content link.
+     * @param link - Content Permalink
+     * @return - Image url of an Article
+     */
+    public String getKeyContentImgLink(String link){
+        String retVal;
+        SQLiteDatabase db = this.getWritableDatabase();
+        String SELECT =  "SELECT " + KEY_CONTENT_IMG_LINK + " FROM " + TABLE_CONTENT + " WHERE "
+                + KEY_CONTENT_PERMALINK + "=\"" + link + "\"";
+
+        Cursor cursor = db.rawQuery(SELECT, null);
+        cursor.moveToFirst();
+        if(cursor.getCount() == 1)
+            retVal = cursor.getString(0);
+        else
+            retVal = " ";
+        cursor.close();
+        return retVal;
+    }
+
+    /**
+     * Returns the associated image url of a given content link.
+     * @param link - Content Permalink
+     * @return - Image url of an Article
+     */
+    public int getKeyContentDateId(String link){
+        int retVal;
+        SQLiteDatabase db = this.getWritableDatabase();
+        String SELECT =  "SELECT " + KEY_CONTENT_DATE_ID + " FROM " + TABLE_CONTENT + " WHERE "
+                + KEY_CONTENT_PERMALINK + "=\"" + link + "\"";
+
+        Cursor cursor = db.rawQuery(SELECT, null);
+        cursor.moveToFirst();
+        if(cursor.getCount() == 1)
+            retVal = cursor.getInt(0);
+        else
+            retVal = -1;
+        cursor.close();
+        return retVal;
+    }
+
+    /**
      * Returns the id to the associated string of an article's posted date.
      * @param date Date Posted
      * @return ID associated with the Date
@@ -303,7 +387,7 @@ public class DatabaseModel extends SQLiteOpenHelper{
      * @param title RSS Feed Title
      * @return Returns the RSS Link
      */
-    public String findLink(String title){
+    public String findRssLink(String title){
         SQLiteDatabase db = this.getReadableDatabase();
         String selectLink = "Select " + KEY_RSS_LINK + " FROM " + TABLE_RSS +
                 " WHERE " + KEY_RSS_TITLE + "='" + title + "'";
@@ -532,7 +616,7 @@ public class DatabaseModel extends SQLiteOpenHelper{
 
         String[] selected = new String[list.size()];
         for(int i = 0; i < list.size(); i++){
-            selected[i] = findLink(list.get(i));
+            selected[i] = findRssLink(list.get(i));
         }
         return selected;
     }

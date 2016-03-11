@@ -1,11 +1,14 @@
 package edu.cpsc4820.bhglove.simplenewsreader.view;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -54,9 +57,6 @@ public class NewsFeed extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_feed);
-
-        //TODO: Maybe move the drawer and toolbar into a different class for use everywhere
-        //TODO: Maybe add info to drawer
         //Toolbar at the top. Allows the navigation bar to overlap it and gives the ability to add actions
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar)
                 findViewById(R.id.toolbar);
@@ -67,6 +67,14 @@ public class NewsFeed extends AppCompatActivity {
         //Create the navigation bar
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        //Set the users name
+        SharedPreferences preferences = getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE);
+        TextView fname = (TextView) findViewById(R.id.nav_fname);
+        fname.setText(preferences.getString(MainActivity.KEY_FNAME, ""));
+
+        TextView lname = (TextView) findViewById(R.id.nav_lname);
+        lname.setText(preferences.getString(MainActivity.KEY_LNAME, ""));
+
         //Array adapter for the navigation bar
         ArrayAdapter<String> drawerAdapter = new ArrayAdapter<String>(getApplicationContext(),
                R.layout.navigation_item, mNavigationDrawerItemsTitles){
@@ -122,6 +130,10 @@ public class NewsFeed extends AppCompatActivity {
                         break;
                     }
                     case (5):{
+                        SharedPreferences.Editor editor = getSharedPreferences
+                                (MainActivity.PREFERENCES, Context.MODE_PRIVATE).edit();
+                        editor.clear();
+                        editor.apply();
                         Intent intent = new Intent(NewsFeed.this, LoginActivity.class);
                         startActivity(intent);
                         break;
