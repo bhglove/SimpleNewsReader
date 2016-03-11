@@ -251,10 +251,7 @@ public class NewsFeed extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        /**
-         * TODO: Add web page into a tab view
-         * TODO: Mark as favorite
-         */
+
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

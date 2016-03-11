@@ -56,6 +56,8 @@ public class DatabaseController {
     private ArrayList<String> images;
     private ArrayList<String> dates;
 
+
+
     private ArrayList mListSelected;   //This is the selected feeds the user wants to display on the news feed
     private ArrayList mListAvailable;
     private Feeds feedList;
@@ -224,6 +226,8 @@ public class DatabaseController {
         return mListSelected;
     }
 
+
+
     /**
      * Mediator function that returns the Titles for all articles
      * @return ArrayList
@@ -348,6 +352,12 @@ public class DatabaseController {
         }
     }
 
+    public void refreshFavoriteContent(){
+        progress = 0;
+        //TODO access refresh content
+        //TODO populate the array list using access
+    }
+
     /**
      * Returns the adapter needed for the NewsFeed ListView. Sets a description and article title.
      *
@@ -366,9 +376,7 @@ public class DatabaseController {
      */
     public ArrayAdapter createNewsFeedAdapter(final Context context) {
         ArrayAdapter mArrayAdapter;
-        /**
-         * Split the articles into pages using the SQL Statement TODO SPLIT INTO PAGES
-         */
+
         mArrayAdapter = new ArrayAdapter<String>(context, R.layout.article, mData.getHeadlines()) {
 
             @Override
@@ -420,6 +428,7 @@ public class DatabaseController {
         };
         return mArrayAdapter;
     }
+
 
     /**
      * Private class used to Parse RSS Feeds

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class DatabaseModel extends SQLiteOpenHelper{
     /* Database Information */
     private static final String DATABASE_NAME = "SIMPLE_RSS_READER";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     /*RSS Feed Table Information*/
     private static final String TABLE_RSS = "RSS";
@@ -40,7 +40,6 @@ public class DatabaseModel extends SQLiteOpenHelper{
     private static final String KEY_CONTENT_PERMALINK = "PERMALINK";
     private static final String KEY_CONTENT_IMG_LINK = "IMAGE";
     private static final String KEY_CONTENT_DESCRIPTION = "DESCRIPTION";
-
     /*Date Table Information*/
     private static final String TABLE_DATE = "DATE";
     private static final String KEY_DATE_ID = "DATE_ID";
@@ -49,6 +48,7 @@ public class DatabaseModel extends SQLiteOpenHelper{
     /*Content Date Table Information*/
     private static final String TABLE_CONTENT_DATE = "CONTENT_DATE";
     private static final String KEY_CONTENT_DATE_ID = "CONTENT_DATE_ID";
+
 
     public DatabaseModel(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -67,7 +67,7 @@ public class DatabaseModel extends SQLiteOpenHelper{
         String CREATE_TABLE_CONTENT = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTENT + "(" + KEY_CONTENT_ID +
                  " INTEGER PRIMARY KEY AUTOINCREMENT DEFAULT 0, " + KEY_CONTENT_HEADLINE + " TEXT, " +
                 KEY_CONTENT_DESCRIPTION + " TEXT, " + KEY_CONTENT_PERMALINK + " TEXT, " +
-                KEY_CONTENT_IMG_LINK + " TEXT )";
+                KEY_CONTENT_IMG_LINK + " TEXT)";
         db.execSQL(CREATE_TABLE_CONTENT);
 
         String CREATE_TABLE_RSS_CONTENT = "CREATE TABLE IF NOT EXISTS " + TABLE_RSS_CONTENT + "("

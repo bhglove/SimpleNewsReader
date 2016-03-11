@@ -40,7 +40,8 @@
                 android:scaleType="fitXY"
                 android:background="#00ffffff"
                 android:layout_marginRight="20dp"
-                android:contentDescription="@string/article_fav_button" />
+                android:contentDescription="@string/article_fav_button"
+                android:clickable="false" />
 
             <LinearLayout
                 android:orientation="horizontal"

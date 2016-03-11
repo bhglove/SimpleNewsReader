@@ -1,8 +1,19 @@
 package edu.cpsc4820.bhglove.simplenewsreader.controller;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.text.Html;
 import android.util.JsonReader;
 import android.util.Log;
+import android.util.LruCache;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,7 +32,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+
+import edu.cpsc4820.bhglove.simplenewsreader.R;
 
 /**
  * Created by Benjamin Glover on 3/7/2016.
@@ -34,14 +48,69 @@ public class AccessDatabase {
     private static AccessDatabase access = null;
     private static final String dbUrl =
             "http://people.cs.clemson.edu/~bhglove/CPSC482/Assignments/Assignment4Portal/";
-
-    private  AccessDatabase(){
-
+    private ArrayList<String> favHeadlines; //The title of the articles
+    private ArrayList<String> favLinks;     //The weblink of the article
+    private ArrayList<String> favDescription; //A description of the article (Contains HTML data)
+    private ArrayList<String> favImages;
+    DatabaseController mData;
+    private  AccessDatabase(Context context){
+        mData = mData.getInstance(context);
     }
 
-    public static AccessDatabase getInstance(){
-        if(access == null) access = new AccessDatabase();
+    public static AccessDatabase getInstance(Context context){
+        if(access == null) access = new AccessDatabase(context);
         return access;
+    }
+    /**
+     * Mediator function that returns the Titles for all articles
+     * @return ArrayList
+     */
+    public ArrayList<String> getFavoriteHeadlines() {
+        //TODO
+        //favHeadlines = db.getFavoriteHeadlines();
+        return favHeadlines;
+    }
+
+    /**
+     * Mediator function that returns all Links for all articles
+     * @return ArrayList
+     */
+    public ArrayList<String> getFavoriteLinks() {
+        //TODO
+        //favLinks = db.getFavoriteLinks();
+        return favLinks;
+    }
+
+    /**
+     * Mediator function that returns all Descriptions for all articles
+     * @return ArryList
+     */
+    public ArrayList<String> getFavoriteDescriptions() {
+        //TODO
+        //favDescription = db.getFavoriteDescriptions();
+        return favDescription;
+    }
+
+    /**
+     * Returns the image urls from the database.
+     * @return ArrayList Images stored in database.
+     */
+    public ArrayList<String> getFavoriteImages(){
+        //TODO
+        // favImages = db.getFavoriteImages();
+        return favImages;
+    }
+    
+    public void refreshFavoriteContent(){
+        //TODO Set arraylists
+    }
+
+    public String getContentDate(String link){
+        return null;
+    }
+
+    public String getContentTitle(String link){
+        return null;
     }
 
     private String getFirstName(String email){
@@ -208,5 +277,65 @@ public class AccessDatabase {
             Log.d("JSON", "JSON ERROR: " + e.getLocalizedMessage());
         }
         return retVal;
+    }
+
+
+
+    public ArrayAdapter createFavoritesAdapter(final Context context) {
+        ArrayAdapter mArrayAdapter;
+        /**
+         * Split the articles into pages using the SQL Statement
+         */
+        mArrayAdapter = new ArrayAdapter<String>(context, R.layout.article,
+                access.getFavoriteHeadlines()) {
+
+            @Override
+            public View getView(final int position, View convertView,
+                                ViewGroup parent) {
+                if(convertView == null)
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.article, parent, false);
+                //Handler handler = new Handler();
+                final ImageView imageView = (ImageView) convertView.findViewById(R.id.article_imgview);
+
+                TextView headlineTxtView = (TextView) convertView.findViewById(R.id.headline);
+                TextView descriptionTxtView = (TextView) convertView.findViewById(R.id.description);
+                TextView pubDateTxtView = (TextView) convertView.findViewById(R.id.pubDate);
+                TextView rssTitleTxtView = (TextView) convertView.findViewById(R.id.rssTitle);
+
+                /*YOUR CHOICE OF COLOR*/
+                headlineTxtView.setTextColor(Color.BLUE);
+                headlineTxtView.setText(access.getFavoriteHeadlines().get(position));
+
+
+                String description = Html.fromHtml(access.getFavoriteDescriptions().get(position).replaceAll("(<(/)img>)|(<img.+?>)", "")).toString().trim();
+                descriptionTxtView.setText(description);
+                descriptionTxtView.setTextColor(Color.GRAY);
+
+                pubDateTxtView.setText(getContentDate(access.getFavoriteLinks().get(position)));
+                pubDateTxtView.setTextColor(Color.GRAY);
+
+                rssTitleTxtView.setTextColor(Color.GRAY);
+                rssTitleTxtView.setText(getContentTitle(access.getFavoriteLinks().get(position)));
+                try {
+                    String image = access.getFavoriteImages().get(position);
+                    if (image == null) {
+                        image = "www.example.com";
+                    }
+                    final String imageUrl = image;
+
+                    if(image.contains("www.example.com")) {
+                        imageView.setImageResource(R.drawable.rss);
+                        Log.d("Image", "Set stock image ");
+                    }
+                    else{
+                        mData.loadBitmap(imageUrl, imageView);
+                    }
+                }catch (IndexOutOfBoundsException e){
+                    Log.d("Bounds", access.getFavoriteHeadlines().size() + " " + access.getFavoriteImages().size());
+                }
+                return convertView;
+            }
+        };
+        return mArrayAdapter;
     }
 }
