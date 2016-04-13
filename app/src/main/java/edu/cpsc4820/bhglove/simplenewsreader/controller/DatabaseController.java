@@ -60,12 +60,11 @@ public class DatabaseController {
 
     private ArrayList mListSelected;   //This is the selected feeds the user wants to display on the news feed
     private ArrayList mListAvailable;
-    private Feeds feedList;
     private DatabaseModel db = null;
     private Context context;
     private LruCache<String, Bitmap> mMemoryCache;
 
-    private int progress;
+    private double progress;
 
     /** Initialize variables and set the three preset RSS feeds. */
    private DatabaseController(Context context){
@@ -82,9 +81,11 @@ public class DatabaseController {
        if(db == null){
            db = new DatabaseModel(context);
        }
-       feedList = new Feeds();
-       for(int i = 0; i < feedList.getAllTitles().length; i++)
-              db.createNewFeed(feedList.getTitleAt(i), feedList.getLinkAt(i));
+       //TODO Retreive feeds from external database
+        Feeds feedlist = new Feeds();
+       for(int i = 0; i < feedlist.getAllLinks().length; i++){
+           createNewFeed(feedlist.getTitleAt(i), feedlist.getLinkAt(i));
+       }
 
        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
        final int cacheSize = maxMemory / 8;
@@ -259,16 +260,6 @@ public class DatabaseController {
         return retVal;
     }
 
-    /**
-     * Receives the associated date id of an article.
-     * @param link
-     * @return
-     */
-    public int getContentDateInt(String link){
-        int retVal;
-        retVal = db.getKeyContentDateId(link);
-        return retVal;
-    }
 
     /**
      * Mediator function that returns the Titles for all articles
@@ -311,7 +302,7 @@ public class DatabaseController {
      * @param link Permalink of the article
      * @return String Content Title
      */
-    public String getContentTitle(String link){
+    public String getContentRssTitle(String link){
         return db.getContentRssTitle(db.getContentId(link));
     }
 
@@ -371,8 +362,12 @@ public class DatabaseController {
      * Returns the progress made by the thread downloading and parsing rss feeds.
      * @return int
      */
-    public int getProgress(){
+    public double getProgress(){
         return progress;
+    }
+
+    public void clearDatabase(){
+        db.refreshContent();
     }
 
     public void refreshDataContent(){
@@ -441,7 +436,7 @@ public class DatabaseController {
                 pubDateTxtView.setTextColor(Color.GRAY);
 
                 rssTitleTxtView.setTextColor(Color.GRAY);
-                rssTitleTxtView.setText(getContentTitle(mData.getLinks().get(position)));
+                rssTitleTxtView.setText(getContentRssTitle(mData.getLinks().get(position)));
                 try {
                     String image = mData.getImages().get(position);
                     if (image == null) {

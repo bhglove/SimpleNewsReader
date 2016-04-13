@@ -1,6 +1,7 @@
 package edu.cpsc4820.bhglove.simplenewsreader.view;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
@@ -15,6 +16,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import edu.cpsc4820.bhglove.simplenewsreader.R;
 import edu.cpsc4820.bhglove.simplenewsreader.controller.AccessDatabase;
 import edu.cpsc4820.bhglove.simplenewsreader.controller.DatabaseController;
@@ -23,16 +26,20 @@ public class FavoriteArticleActivity extends AppCompatActivity {
     private ListView mListView;
     private AccessDatabase mData = null;
     private ProgressBar mProgressBar;
+    private int user_id;
+    private TextView empty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite_article);
         mListView = (ListView) findViewById(R.id.favoriteListView);
-
+        empty = (TextView) findViewById(R.id.emptyFav);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar3);
         mProgressBar.setVisibility(View.VISIBLE);
         mProgressBar.setMax(100);
+        user_id = getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE)
+                .getInt(MainActivity.KEY_USERID, 0);
 
         if (mData == null)
             mData = AccessDatabase.getInstance(getApplicationContext());
@@ -45,9 +52,9 @@ public class FavoriteArticleActivity extends AppCompatActivity {
                 final TextView downloading = (TextView) findViewById(R.id.downloadingText2);
                 downloading.setVisibility(View.VISIBLE);
                 try {
-                    mData.refreshFavoriteContent();
-                    while (mData.getProgress() < 98) {
-                        Thread.sleep(200);
+                    mData.refreshFavoriteContent(user_id);
+                    while (mData.getProgress() < 95) {
+                        Thread.sleep(500);
                     }
                 }catch (InterruptedException e) {
                     e.printStackTrace();
@@ -62,6 +69,11 @@ public class FavoriteArticleActivity extends AppCompatActivity {
             }
         });
         thread.start();
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
     }
 
     /**

@@ -49,7 +49,7 @@ public class NewsFeed extends AppCompatActivity {
     private DatabaseController mData = null;
     private ProgressBar mProgressBar;
     private static String[] mNavigationDrawerItemsTitles = {"News Feed", "Manage Subscriptions" ,
-            "Currently Reading", "My Favorites", "Settings", "Log Out"};
+            "My Favorites", "Settings"};
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
 
@@ -68,7 +68,8 @@ public class NewsFeed extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         //Set the users name
-        SharedPreferences preferences = getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences(MainActivity.PREFERENCES,
+                Context.MODE_PRIVATE);
         TextView fname = (TextView) findViewById(R.id.nav_fname);
         fname.setText(preferences.getString(MainActivity.KEY_FNAME, ""));
 
@@ -94,10 +95,9 @@ public class NewsFeed extends AppCompatActivity {
          * Implements functionality for the navigation bar.
          * 0: News Feed: Closes the navigation bar.
          * 1: Manage Subscriptions: Activates the subscription activity
-         * 2: Currently Reading: TODO: Make a tab view of articles
-         * 3: My Favorites:
-         * 4: Settings:
-         * 5: Log Out:
+         * 2: My Favorites:
+         * 3: Settings:
+         * 4: Log Out:
          */
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -113,31 +113,18 @@ public class NewsFeed extends AppCompatActivity {
                         break;
                     }
                     case (2):{
-                        Toast.makeText(getApplicationContext(), "WIP", Toast.LENGTH_SHORT).show();
-                        onBackPressed();
-                        break;
-                    }
-                    case (3):{
                         Intent intent = new Intent(NewsFeed.this, FavoriteArticleActivity.class);
                         startActivity(intent);
                         onBackPressed();
                         break;
                     }
-                    case (4):{
+                    case (3):{
                         Intent intent = new Intent(NewsFeed.this, SettingsActivity.class);
                         startActivity(intent);
                         onBackPressed();
                         break;
                     }
-                    case (5):{
-                        SharedPreferences.Editor editor = getSharedPreferences
-                                (MainActivity.PREFERENCES, Context.MODE_PRIVATE).edit();
-                        editor.clear();
-                        editor.apply();
-                        Intent intent = new Intent(NewsFeed.this, LoginActivity.class);
-                        startActivity(intent);
-                        break;
-                    }
+
                 }
             }
         });
@@ -264,22 +251,6 @@ public class NewsFeed extends AppCompatActivity {
             }
         });
 
-        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(NewsFeed.this);
-                dialog.setTitle("Options");
-                dialog.setItems(new String[]{"Open in New Tab", "Mark as Favorite"},
-                        new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-                dialog.show();
-                return true;
-            }
-        });
     }
 }
 

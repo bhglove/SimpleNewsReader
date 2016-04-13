@@ -22,6 +22,9 @@ import org.json.JSONObject;
 
 import edu.cpsc4820.bhglove.simplenewsreader.R;
 import edu.cpsc4820.bhglove.simplenewsreader.controller.AccessDatabase;
+import edu.cpsc4820.bhglove.simplenewsreader.model.Feeds;
+
+import static edu.cpsc4820.bhglove.simplenewsreader.view.Subscription.*;
 
 public class Register extends AppCompatActivity {
     private ProgressBar progressBar;
@@ -119,7 +122,6 @@ public class Register extends AppCompatActivity {
                 JSONObject object = new JSONObject(access.executeForString(variables, access.USER_INFO));
                 int userId = object.getInt("user_id");
                 SharedPreferences.Editor editor = getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE).edit();
-
                 editor.putInt(MainActivity.KEY_USERID, userId);
                 editor.putString(MainActivity.KEY_FNAME, fname);
                 editor.putString(MainActivity.KEY_LNAME, lname);

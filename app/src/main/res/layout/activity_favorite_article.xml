@@ -42,10 +42,9 @@
         android:text="@string/empty_favorites"
         android:id="@+id/emptyFavoritesFeed"
         android:visibility="invisible"
-        android:layout_below="@+id/progressBar3"
-        android:layout_alignLeft="@+id/progressBar3"
-        android:layout_alignStart="@+id/progressBar3"
-        android:layout_marginTop="120dp" />
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/emptyFav"
+        android:layout_alignStart="@+id/emptyFav" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"
@@ -64,6 +63,15 @@
         android:layout_alignTop="@+id/favoriteListView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="58dp"
+        android:visibility="invisible" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/emptyFav"
+        android:layout_alignTop="@+id/progressBar3"
+        android:layout_centerHorizontal="true"
         android:visibility="invisible" />
 
 </RelativeLayout>

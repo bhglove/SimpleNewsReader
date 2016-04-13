@@ -40,6 +40,11 @@ public class DatabaseModel extends SQLiteOpenHelper{
     private static final String KEY_CONTENT_PERMALINK = "PERMALINK";
     private static final String KEY_CONTENT_IMG_LINK = "IMAGE";
     private static final String KEY_CONTENT_DESCRIPTION = "DESCRIPTION";
+
+    /*One RSS Feed to Multiple Content Table Information*/
+    private static final String TABLE_FAV_CONTENT = "FAV_CONTENT";
+    private static final String KEY_FAV_CONTENT_ID = "FAV_ID";
+
     /*Date Table Information*/
     private static final String TABLE_DATE = "DATE";
     private static final String KEY_DATE_ID = "DATE_ID";
@@ -325,26 +330,6 @@ public class DatabaseModel extends SQLiteOpenHelper{
         return retVal;
     }
 
-    /**
-     * Returns the associated image url of a given content link.
-     * @param link - Content Permalink
-     * @return - Image url of an Article
-     */
-    public int getKeyContentDateId(String link){
-        int retVal;
-        SQLiteDatabase db = this.getWritableDatabase();
-        String SELECT =  "SELECT " + KEY_CONTENT_DATE_ID + " FROM " + TABLE_CONTENT + " WHERE "
-                + KEY_CONTENT_PERMALINK + "=\"" + link + "\"";
-
-        Cursor cursor = db.rawQuery(SELECT, null);
-        cursor.moveToFirst();
-        if(cursor.getCount() == 1)
-            retVal = cursor.getInt(0);
-        else
-            retVal = -1;
-        cursor.close();
-        return retVal;
-    }
 
     /**
      * Returns the id to the associated string of an article's posted date.

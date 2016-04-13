@@ -1,8 +1,10 @@
 package edu.cpsc4820.bhglove.simplenewsreader.view;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,6 +35,7 @@ public class Subscription extends AppCompatActivity {
     private ArrayAdapter<String> mAdapter;
     private TextView mSubscriptionTitle;
     private TextView mEmptyText;
+    private AccessDatabase access;
 
     private DatabaseController data;
 
@@ -51,7 +54,7 @@ public class Subscription extends AppCompatActivity {
         if(data == null) {
            data = DatabaseController.getInstance(getApplicationContext());
         }
-
+        access = AccessDatabase.getInstance(getApplicationContext());
         mListView = (ListView) findViewById(R.id.categoryListView);
         mSubscriptionTitle = (TextView) findViewById(R.id.textView);
         mEmptyText = (TextView) findViewById(R.id.empty_list);
@@ -242,7 +245,8 @@ public class Subscription extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(Subscription.this);
                                 dialogBuilder.setTitle("Add Custom RSS");
-
+                                final SharedPreferences pref = getSharedPreferences(MainActivity.PREFERENCES,
+                                                Context.MODE_PRIVATE);
                                 final EditText rssTitle = new EditText(getApplicationContext());
 
                                 rssTitle.setHint("Feed Name");
@@ -283,8 +287,10 @@ public class Subscription extends AppCompatActivity {
                                                     mAdapter.clear();
                                                     mAdapter.addAll(data.getSelected());
                                                     mAdapter.notifyDataSetChanged();
-
-                                                    String varables = "title="+title+"&link"+link;
+                                                    int userid = pref.getInt(MainActivity.KEY_USERID, 0);
+                                                    String varables = "title="+title+"&link="+link+
+                                                            "&user_id="+userid;
+                                                    Log.d("RSS", "Insert " + varables);
                                                     AddRss add = new AddRss();
                                                     add.execute(varables);
                                                 }
@@ -302,13 +308,15 @@ public class Subscription extends AppCompatActivity {
         });
     }
 
-    private class AddRss extends AsyncTask<String, Void, Integer>{
+    public class AddRss extends AsyncTask<String, Void, Integer>{
 
         @Override
         protected Integer doInBackground(String... params) {
             String variables = params[0];
-            AccessDatabase access = AccessDatabase.getInstance(getApplicationContext());
-            return access.executeForInt(variables, access.ADD_RSS);
+            Log.d("RSS", "parameters: " + variables);
+
+            access.executeForInt(variables, access.ADD_RSS);
+            return 0;
         }
     }
 }

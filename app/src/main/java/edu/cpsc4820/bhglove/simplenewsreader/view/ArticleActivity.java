@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -44,14 +45,31 @@ public class ArticleActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_article);
-        mData = DatabaseController.getInstance(getApplicationContext());
-        mFavButton = (ImageButton) findViewById(R.id.favArticleButton);
-        //Retrieves the headline and link clicked on NewsFeed activity
         Intent intent = getIntent();
         String title = intent.getStringExtra("Title");
         link = intent.getStringExtra("Link");
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                IsFavortieTask task = new IsFavortieTask();
+                task.execute();
+            }
+        });
+        thread.start();
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_article);
+        mData = DatabaseController.getInstance(getApplicationContext());
+
+
+
+        mFavButton = (ImageButton) findViewById(R.id.favArticleButton);
+        setFavImage();
+        Log.d("Fav", "UI Fav is " + toggleFav);
+
+        //Retrieves the headline and link clicked on NewsFeed activity
+
 
         mTitle = (TextView) findViewById(R.id.article_title);
         if(title == null){
@@ -98,8 +116,12 @@ public class ArticleActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         mWebView.onPause();
+
         MarkAsFavorite fav = new MarkAsFavorite();
         fav.execute();
+        Intent intent = new Intent(ArticleActivity.this, NewsFeed.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
         super.onBackPressed();
     }
 
@@ -114,30 +136,79 @@ public class ArticleActivity extends AppCompatActivity {
         }
     }
 
+    private void setFavImage(){
+        if(toggleFav){
+            mFavButton.setImageResource(R.drawable.ic_star_red_400_18dp);
+        }
+        else{
+            mFavButton.setImageResource(R.drawable.ic_star_border_white_18dp);
+        }
+    }
    private class MarkAsFavorite extends AsyncTask<Void, Void, Integer>{
 
        @Override
        protected Integer doInBackground(Void ...params) {
            try{
                AccessDatabase access = AccessDatabase.getInstance(getApplicationContext());
+               SharedPreferences pref = getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE);
+               String rssTitle = mData.getContentRssTitle(link);
                String headline = mData.getContentHeadline(link);
                String description = mData.getContentDescription(link);
                String image = mData.getContentImageUrl(link);
-               int dateID = mData.getContentDateInt(link);
+               String date = mData.getContentDate(link);
 
                JSONObject object = new JSONObject();
+               object.accumulate("rss_title", rssTitle);
                object.accumulate("headline", headline);
                object.accumulate("description", description);
-               object.accumulate("image", image);
-               object.accumulate("date_id", dateID);
-
-               String variable = "object="+object.toString();
-
+               object.accumulate("permalink", link);
+               if(image == null){
+                   image = "null";
+               }
+               object.accumulate("imageUrl", image);
+               object.accumulate("date", date);
+               if(toggleFav){
+                   object.accumulate("fav", 1);
+               }
+               else{
+                   object.accumulate("fav", 0);
+               }
+               int user_id = pref.getInt(MainActivity.KEY_USERID, 0);
+               String variable = "object="+object.toString()+"&user_id="+user_id;
+               access.executeForInt(variable, access.ADD_CONTENT);
+               Log.d("object", object.toString());
            } catch (JSONException e) {
                e.printStackTrace();
            }
            return 0;
        }
    }
+    private class IsFavortieTask extends AsyncTask<Void, Void, Integer>{
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            AccessDatabase access = AccessDatabase.getInstance(getApplicationContext());
+            SharedPreferences pref = getSharedPreferences(MainActivity.PREFERENCES, Context.MODE_PRIVATE);
+            int userid = pref.getInt(MainActivity.KEY_USERID, 0);
+            String variables = "user_id="+userid+"&link="+link;
+            Log.d("Fav", "variables " + variables);
+            int result = access.executeForInt(variables, access.IS_FAV);
+            if(result == 1){
+              toggleFav = true;
+            }
+            else{
+                toggleFav = false;
+            }
+            Log.d("Fav", "Fav is " + toggleFav);
+            Log.d("Fav", "Link is " + link);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setFavImage();
+                }
+            });
+            return 0;
+        }
+    }
 }
 

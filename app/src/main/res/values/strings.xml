@@ -19,21 +19,23 @@
     <string name="about_label_3">New Technologies</string>
     <!-- Description and Resources -->
     <string name="about_text">This android application parses RSS feeds and displays the contents
-    into an easy to read and unified place.\n\nCreated by: Benjamin Glover (2/27/2016)
+    into an easy to read and unified place.\n\nCreated by: Benjamin Glover (3/10/2016)
     </string>
     <string name="about_text_1">Add a new source of information from either a
         provided sample of RSS feeds or enter your own by pressing the "Add Category" button.\n
         After a new source is entered into the list, press the back button to return to the News Feed.\n
         There, the articles will populate and able to be clicked and view.\n\nEnjoy your readings!</string>
     <string name="about_text_2">
-        Progress Bar and Threads \n
-        http://huuah.com/android-progress-bar-and-thread-updating/ \n\n
-        Inner Join \n
-        http://stackoverflow.com/questions/10195451/sql-inner-join-with-3-table \n\n
-        Caching Images\n
-        http://developer.android.com/intl/zh-tw/training/displaying-bitmaps/cache-bitmap.html
+        Shared Preference \n
+         https://androidresearch.wordpress.com/2012/03/31/writing-and-reading-from-sharedpreferences/
+ \n\n
+        Toolbar \n
+        https://www.codeofaninja.com/2014/02/android-navigation-drawer-example.html\n\n
+        Navigation Menu\n
+        http://developer.android.com/intl/zh-tw/training/implementing-navigation/nav-drawer.html#DrawerLayout
     </string>
-    <string name="about_text_3">Image Caching\nThreads and Handler\nInner Join</string>
+    <string name="about_text_3">Toolbar\nShared Preferences to remember if the user is currently logged in.
+        \nSettings\nNavigation Menu on the News Feed Actitivy slides out.</string>
 
     <!-- Strings Related to Activities-->
     <string name="title_activity_loading">LoadingActivity</string>
@@ -90,4 +92,5 @@
     <string name="fav_articles_title">Favorites</string>
     <string name="settings_title">Settings</string>
     <string name="empty_favorites">No favorites</string>
+    <string name="logout_button">Log Out</string>
 </resources>
