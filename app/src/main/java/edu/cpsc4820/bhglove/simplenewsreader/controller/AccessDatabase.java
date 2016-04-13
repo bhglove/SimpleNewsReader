@@ -1,13 +1,10 @@
 package edu.cpsc4820.bhglove.simplenewsreader.controller;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.text.Html;
-import android.util.JsonReader;
 import android.util.Log;
-import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,22 +15,15 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 import edu.cpsc4820.bhglove.simplenewsreader.R;
 
@@ -52,15 +42,17 @@ public class AccessDatabase {
     public final String REGISTER = "register.php";
     public final String USER_INFO = "getNameFromEmail.php";
     public final String ADD_RSS = "addRss.php";
-
+    public final String ADD_CONTENT = "addContent.php";
+    public final String GET_CONTENT = "getContent.php";
+    public final String IS_FAV = "isFav.php";
 
     private ArrayList<String> favHeadlines; //The title of the articles
     private ArrayList<String> favLinks;     //The weblink of the article
     private ArrayList<String> favDescription; //A description of the article (Contains HTML data)
     private ArrayList<String> favImages;
-    private int progress;
+    private double progress;
     private DatabaseController mData;
-
+    private TextView empty;
     private  AccessDatabase(Context context){
         mData = mData.getInstance(context);
         favHeadlines = new ArrayList<String>();
@@ -74,15 +66,16 @@ public class AccessDatabase {
         return access;
     }
 
-    public int getProgress(){
+    public double getProgress(){
         return progress;
     }
 
-    public void refreshFavoriteContent(){
+    public void refreshFavoriteContent(int user_id){
         progress = 0;
         //TODO access refresh content
+        GetFavoriteContent favTask = new GetFavoriteContent();
+        favTask.execute(user_id);
         //TODO populate the array list using access
-        progress = 100;
     }
 
     /**
@@ -191,8 +184,9 @@ public class AccessDatabase {
                 builder.append(line);
             }
             reader.close();
-            JSONObject jObject = new JSONObject(builder.toString());
             Log.d("Register", "Result: " + builder.toString());
+            JSONObject jObject = new JSONObject(builder.toString());
+
             retVal = jObject.getInt("result");
             conn.disconnect();
         } catch (MalformedURLException e) {
@@ -247,6 +241,9 @@ public class AccessDatabase {
                     if (image == null) {
                         image = "www.example.com";
                     }
+                    if(image.contains("null")){
+                        image = "www.example.com";
+                    }
                     final String imageUrl = image;
 
                     if(image.contains("www.example.com")) {
@@ -263,5 +260,59 @@ public class AccessDatabase {
             }
         };
         return mArrayAdapter;
+    }
+
+    private class GetFavoriteContent extends AsyncTask<Integer, Void, Integer>{
+        @Override
+        protected void onPreExecute(){
+            favHeadlines.clear();
+            favDescription.clear();
+            favLinks.clear();
+            favImages.clear();
+        }
+        @Override
+        protected Integer doInBackground(Integer... params) {
+            try {
+                String variables = "user_id=" + params[0];
+
+                String data = executeForString(variables, GET_CONTENT);
+                String[] result = data.split(";");
+                if(result.length == 0){
+                    progress = 100;
+
+                }
+                else if(result.length == 1){
+                    if(result[0].contains("false")){
+                        progress = 100;
+                        return 0;
+                    }
+                    Log.d("Fav", data);
+                    JSONObject object = new JSONObject(result[0]);
+
+                    favHeadlines.add(object.getString("headline"));
+                    favDescription.add(object.getString("description"));
+                    favImages.add(object.getString("imageUrl"));
+                    favLinks.add(object.getString("permalink"));
+                    progress = 100;
+                }
+                else {
+                    Log.d("Progress", "Total: " + result.length + " " + result.toString());
+                    for (int i = 0; i < result.length; i++) {
+                        JSONObject object = new JSONObject(result[i]);
+                        favHeadlines.add(object.getString("headline"));
+                        favDescription.add(object.getString("description"));
+                        favImages.add(object.getString("imageUrl"));
+                        favLinks.add(object.getString("permalink"));
+
+                        progress = (100 / (double) result.length) * (i + 1);
+                        Log.d("Progress", "Progress = " + progress + " or " + getProgress());
+                    }
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }
