@@ -37,7 +37,7 @@ import edu.cpsc4820.bhglove.simplenewsreader.R;
 public class AccessDatabase {
     private static AccessDatabase access = null;
     private static final String dbUrl =
-            "http://people.cs.clemson.edu/~bhglove/CPSC482/Assignments/Assignment4Portal/";
+            "https://people.cs.clemson.edu/~bhglove/CPSC482/Assignments/Assignment4Portal/";
     public final String LOGIN = "login.php";
     public final String REGISTER = "register.php";
     public final String USER_INFO = "getNameFromEmail.php";
